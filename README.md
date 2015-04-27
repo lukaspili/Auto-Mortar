@@ -88,7 +88,7 @@ public class ShowUserView extends LinearLayout {
 
 @MVP(
         parentComponent = RootActivity.Component.class,
-        viewBaseLayout = LinearLayout.class
+        baseViewLayout = LinearLayout.class
         layout = R.layout.screen_show_user
 )
 public class ShowUserPresenter extends ViewPresenter<MVP_ShowUserScreen.View> {
