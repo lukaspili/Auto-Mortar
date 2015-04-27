@@ -3,8 +3,8 @@ package mvp.navigation;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import flownavigation.container.SimplePathContainer;
 import flownavigation.path.Path;
+import flownavigation.path.SimplePathContainer;
 import flownavigation.view.FramePathContainerView;
 
 /**
