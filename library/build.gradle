@@ -16,12 +16,3 @@ sourceSets {
 dependencies {
     provided 'javax.inject:javax.inject:1'
 }
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            artifactId = POM_ARTIFACT_ID
-            from components.java
-        }
-    }
-}

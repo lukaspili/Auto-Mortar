@@ -7,11 +7,4 @@ dependencies {
     compile project(':library')
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            artifactId = POM_ARTIFACT_ID
-            from components.java
-        }
-    }
-}
+apply from: '../mvn-publish.gradle'
