@@ -410,12 +410,6 @@ It also applies `@Layout` annotation on the generated screens (the annotation is
 Use `@MVP` from package mvp.standalone, in order to generate screen that extend from a custom class. This particular `@MVP` annotation defines a `screenSuperclass` attribute. By default it's none.
 
 
-#### More on Flow navigation library
-
-Flow navigation is another experimental library working with Flow library.  
-It's an alternative to Flow-path that preserves the scopes of previous paths in navigation history. You can check it out here: [https://github.com/lukaspili/flow-navigation](https://github.com/lukaspili/flow-navigation)
-
-
 ## Installation
 
 Gradle apt plugin recommended, like for dagger 2.
@@ -446,10 +440,22 @@ dependencies {
     compile 'com.github.lukaspili:mvp-flowpath:0.1-SNAPSHOT'
     
     // OR use this for Flow navigation
-    compile 'com.github.lukaspili.mvp:mvp-flownavigation:0.1-SNAPSHOT'
+    compile 'com.github.lukaspili:mvp-flownavigation:0.1-SNAPSHOT'
     
     // OR use this for standalone Mortar-MVP
-    compile 'com.github.lukaspili.mvp:mvp-standalone:0.1-SNAPSHOT'
+    compile 'com.github.lukaspili:mvp-standalone:0.1-SNAPSHOT'
+}
+```
+
+Mortar MVP uses an alternative dependency for Mortar, which is up-to-date with the latest commit, also hosted on sonatype ([https://github.com/lukaspili/mortar](https://github.com/lukaspili/mortar)).
+
+```groovy
+repositories {
+	maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+}
+
+dependencies {
+	compile 'com.github.lukaspili:mortar:0.17-SNAPSHOT'
 }
 ```
 
@@ -458,6 +464,12 @@ dependencies {
 Experimental library. Probably lots of edge cases not covered.  
 Discussions and feedback welcomed, please open an issue.  
 Or drop a word on gitter: [https://gitter.im/lukaspili/Mortar-MVP](https://gitter.im/lukaspili/Mortar-MVP)
+
+
+## More on Flow navigation library
+
+Flow navigation is another experimental library upon Flow library.  
+It's an alternative to Flow-path that preserves the scopes of previous paths in navigation history. You can check it out here: [https://github.com/lukaspili/flow-navigation](https://github.com/lukaspili/flow-navigation)
 
 
 ## Author
