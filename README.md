@@ -427,16 +427,16 @@ repositories {
 }
 
 dependencies {
-    apt 'com.github.lukaspili.mvp:mvp-compiler:0.1.0'
+    apt 'com.github.lukaspili.mvp:mvp-compiler:0.1.1'
     
     // use this for Flow-path
-    compile 'com.github.lukaspili.mvp:mvp-flowpath:0.1.0'
+    compile 'com.github.lukaspili.mvp:mvp-flowpath:0.1.1'
     
     // OR use this for Flow navigation
-    compile 'com.github.lukaspili.mvp:mvp-flownavigation:0.1.0'
+    compile 'com.github.lukaspili.mvp:mvp-flownavigation:0.1.1'
     
     // OR use this for standalone Mortar-MVP
-    compile 'com.github.lukaspili.mvp:mvp-standalone:0.1.0'
+    compile 'com.github.lukaspili.mvp:mvp-standalone:0.1.1'
 }
 ```
 
