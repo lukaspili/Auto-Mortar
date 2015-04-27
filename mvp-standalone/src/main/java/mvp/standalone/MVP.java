@@ -1,4 +1,4 @@
-package mvp.flowpath;
+package mvp.standalone;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,6 +22,4 @@ public @interface MVP {
     Class<?> baseViewLayout() default void.class;
 
     Class<?> screenSuperclass() default void.class;
-
-    int layout();
 }

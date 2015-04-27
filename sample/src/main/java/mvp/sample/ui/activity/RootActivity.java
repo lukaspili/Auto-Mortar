@@ -6,16 +6,12 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.google.gson.Gson;
-import mvp.sample.R;
-import mvp.sample.app.ActivityScope;
-import mvp.sample.app.App;
-import mvp.sample.app.presenter.MVP_PostsScreen;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import flow.ActivityFlowSupport;
-import flow.Backstack;
 import flow.Flow;
+import flow.FlowDelegate;
+import flow.History;
 import flownavigation.common.GsonParceler;
 import flownavigation.common.HandlesBack;
 import flownavigation.path.Path;
@@ -23,6 +19,10 @@ import flownavigation.path.PathContainerView;
 import mortar.MortarScope;
 import mortar.bundler.BundleServiceRunner;
 import mortar.dagger2support.DaggerService;
+import mvp.sample.R;
+import mvp.sample.app.ActivityScope;
+import mvp.sample.app.App;
+import mvp.sample.app.presenter.MVP_PostsScreen;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
@@ -31,7 +31,7 @@ public class RootActivity extends Activity implements Flow.Dispatcher {
 
     MortarScope mortarScope;
 
-    ActivityFlowSupport flowSupport;
+    FlowDelegate flowDelegate;
 
     @InjectView(R.id.container)
     PathContainerView pathContainerView;
@@ -39,8 +39,8 @@ public class RootActivity extends Activity implements Flow.Dispatcher {
     @Override
     public Object getSystemService(String name) {
         Object service = null;
-        if (flowSupport != null) {
-            service = flowSupport.getSystemService(name);
+        if (flowDelegate != null) {
+            service = flowDelegate.getSystemService(name);
         }
 
         if (service == null && mortarScope != null && mortarScope.hasService(name)) {
@@ -76,20 +76,20 @@ public class RootActivity extends Activity implements Flow.Dispatcher {
         ButterKnife.inject(this);
 
         GsonParceler parceler = new GsonParceler(new Gson());
-        @SuppressWarnings("deprecation") ActivityFlowSupport.NonConfigurationInstance nonConfig =
-                (ActivityFlowSupport.NonConfigurationInstance) getLastNonConfigurationInstance();
-        flowSupport = ActivityFlowSupport.onCreate(nonConfig, getIntent(), savedInstanceState, parceler, Backstack.single(new MVP_PostsScreen()), this);
+        @SuppressWarnings("deprecation") FlowDelegate.NonConfigurationInstance nonConfig =
+                (FlowDelegate.NonConfigurationInstance) getLastNonConfigurationInstance();
+        flowDelegate = FlowDelegate.onCreate(nonConfig, getIntent(), savedInstanceState, parceler, History.single(new MVP_PostsScreen()), this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        flowSupport.onResume();
+        flowDelegate.onResume();
     }
 
     @Override
     protected void onPause() {
-        flowSupport.onPause();
+        flowDelegate.onPause();
         super.onPause();
     }
 
@@ -97,13 +97,13 @@ public class RootActivity extends Activity implements Flow.Dispatcher {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         BundleServiceRunner.getBundleServiceRunner(this).onSaveInstanceState(outState);
-        flowSupport.onSaveInstanceState(outState);
+        flowDelegate.onSaveInstanceState(outState);
     }
 
     @SuppressWarnings("deprecation") // https://code.google.com/p/android/issues/detail?id=151346
     @Override
     public Object onRetainNonConfigurationInstance() {
-        return flowSupport.onRetainNonConfigurationInstance();
+        return flowDelegate.onRetainNonConfigurationInstance();
     }
 
     @Override
@@ -131,7 +131,7 @@ public class RootActivity extends Activity implements Flow.Dispatcher {
     @Override
     public void onBackPressed() {
         if (((HandlesBack) pathContainerView).onBackPressed()) return;
-        if (flowSupport.onBackPressed()) return;
+        if (flowDelegate.onBackPressed()) return;
 
         super.onBackPressed();
     }

@@ -21,5 +21,5 @@ public @interface MVP {
 
     Class<?> baseViewLayout() default void.class;
 
-    int layout();
+    int layout() default 0;
 }

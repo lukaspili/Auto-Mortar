@@ -145,8 +145,7 @@ Depending which library extension you use, the screen will extend from flow.path
 
 The screen contains all the other associated generated classes (Component, Module, View).
 
-The generated screen is annoted with flow `@Layout` annotation.  
-The `@MVP` annotation requires to define the attribute **layout** that will be then provided to the `@Layout` annotation.
+The generated screen can be annoted with `@Layout` annotation (from mvp-flowpath or mvp-flownavigation). If you want this annotation to be applied on the screen, define the attribute **layout** on the `@MVP` annotation, and its value will be provided to the `@Layout` annotation.
 
 ```java
 @MVP(
@@ -159,7 +158,7 @@ The generated screen looks like:
 ```java
 
 @Generated("mvp.compiler.AnnotationProcessor")
-@Layout(2130903043)
+@Layout(2130903043) // equals to R.layout.my_layout
 public final class MVP_PostsScreen extends Path implements ComponentFactory<RootActivity.Component> {
 
     // ...
@@ -304,9 +303,7 @@ To resume the different uses:
 - presenter must then extend from ViewPresenter<RealView>
 
 
-
 ## More uses
-
 
 ### Passing parameters between screens
 
@@ -376,7 +373,8 @@ public final class MVP_ViewPostScreen extends Path implements ComponentFactory<R
 
 ### Dagger scope
 
-Each generated screen, and its associated component and presenter will be scoped using the `@ScreenScope(Component.class)` (where Component is the generated component).
+Each generated screen, and its associated component and presenter will be scoped using the `@ScreenScope(Component.class)` (where Component is the generated component).  
+ScreenScope is a dagger scope annotation provided by Mortar MVP.
 
 
 ## Library extensions
@@ -390,9 +388,26 @@ The superclass may be:
 
 Thus, `@MVP` annotation is available in three library extensions, depending which one you want to use. Each extension provides its own `@MVP` annotation. 
 
-- **mvp-flowpath** : use `@MVP` from package mvp.flowpath, in order to generate screen that will extend from flow.path.Path.
-- **mvp-flownavigation** : use `@MVP` from package mvp.navigation, in order to generate screen that will extend from flownavigation.path.Path.
-- **mvp-standalone** use `@MVP` from package mvp.standalone, in order to generate screen that extend from a custom class. This particular `@MVP` annotation defines a `screenSuperclass` attribute. By default it's none.
+#### mvp-flowpath  
+
+Use `@MVP` from package mvp.flowpath, in order to generate screen that will extend from flow.path.Path.  
+In addition, this extension provides a `@Layout` annotation that will be applied on the generated screens (`@Layout` was recently moved from Flow core library into its sample).
+
+#### mvp-flownavigation
+
+Use `@MVP` from package mvp.navigation, in order to generate screen that will extend from flownavigation.path.Path.  
+In addition, this extension provides the following classes to speed up the setup with Mortar and Flow:
+
+- MortarContextFactory
+- MortarPathContainerView
+- ScreenScoper
+
+It also applies `@Layout` annotation on the generated screens (the annotation is provided by flow navigation library).
+
+
+#### mvp-standalone
+
+Use `@MVP` from package mvp.standalone, in order to generate screen that extend from a custom class. This particular `@MVP` annotation defines a `screenSuperclass` attribute. By default it's none.
 
 
 #### More on Flow navigation library
@@ -403,7 +418,6 @@ It's an alternative to Flow-path that preserves the scopes of previous paths in 
 
 ## Installation
 
-Add jitpack.io as maven repository.  
 Gradle apt plugin recommended, like for dagger 2.
 
 ```groovy
@@ -423,24 +437,21 @@ apply plugin: 'com.neenbedankt.android-apt'
 repositories {
     jcenter()
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    maven { url "https://jitpack.io" }
 }
 
 dependencies {
-    apt 'com.github.lukaspili.mvp:mvp-compiler:0.1.1'
+    apt 'com.github.lukaspili:mvp-compiler:0.1-SNAPSHOT'
     
     // use this for Flow-path
-    compile 'com.github.lukaspili.mvp:mvp-flowpath:0.1.1'
+    compile 'com.github.lukaspili:mvp-flowpath:0.1-SNAPSHOT'
     
     // OR use this for Flow navigation
-    compile 'com.github.lukaspili.mvp:mvp-flownavigation:0.1.1'
+    compile 'com.github.lukaspili.mvp:mvp-flownavigation:0.1-SNAPSHOT'
     
     // OR use this for standalone Mortar-MVP
-    compile 'com.github.lukaspili.mvp:mvp-standalone:0.1.1'
+    compile 'com.github.lukaspili.mvp:mvp-standalone:0.1-SNAPSHOT'
 }
 ```
-
-The reason we use explicit version numbers is because jitpack.io does not work well with snapshot versions.
 
 ## Status
 

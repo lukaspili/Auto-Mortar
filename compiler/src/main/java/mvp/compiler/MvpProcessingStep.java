@@ -29,6 +29,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import flownavigation.path.Path;
+import flownavigation.view.Layout;
 import mvp.ScreenParam;
 import mvp.compiler.extractor.ElementExtractor;
 import mvp.compiler.message.Message;
@@ -113,14 +114,17 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         screenSpec.setLayout(elementExtractor.getLayout());
         screenSpec.setDaggerComponentTypeName(classNames.getDaggerComponentClassName());
 
-        // screen superclass
+        // screen superclass and layout annotation
         if (elementExtractor.getMvpAnnotationSource() == ElementExtractor.MvpAnnotationSource.FLOW_NAVIGATION) {
             screenSpec.setSuperclassTypeName(ClassName.get(Path.class));
+            screenSpec.setLayoutAnnotationClassName(ClassName.get(Layout.class));
         } else if (elementExtractor.getMvpAnnotationSource() == ElementExtractor.MvpAnnotationSource.FLOW_PATH) {
             screenSpec.setSuperclassTypeName(ClassName.get(flow.path.Path.class));
+            screenSpec.setLayoutAnnotationClassName(ClassName.get(mvp.flowpath.Layout.class));
         } else if (elementExtractor.getScreenSuperclassTypeMirror() != null) {
             screenSpec.setSuperclassTypeName(TypeName.get(elementExtractor.getScreenSuperclassTypeMirror()));
         }
+
 
         if (elementExtractor.getViewTypeMirror() != null) {
             screenSpec.setViewTypeName(TypeName.get(elementExtractor.getViewTypeMirror()));

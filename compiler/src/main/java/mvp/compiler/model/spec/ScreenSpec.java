@@ -16,6 +16,7 @@ public class ScreenSpec extends AbstractSpec {
 
     private final Element element;
     private TypeName superclassTypeName;
+    private ClassName layoutAnnotationClassName;
     private BaseViewSpec baseViewSpec;
     private TypeName viewTypeName;
     private ModuleSpec moduleSpec;
@@ -35,6 +36,14 @@ public class ScreenSpec extends AbstractSpec {
 
     public void setSuperclassTypeName(TypeName superclassTypeName) {
         this.superclassTypeName = superclassTypeName;
+    }
+
+    public ClassName getLayoutAnnotationClassName() {
+        return layoutAnnotationClassName;
+    }
+
+    public void setLayoutAnnotationClassName(ClassName layoutAnnotationClassName) {
+        this.layoutAnnotationClassName = layoutAnnotationClassName;
     }
 
     public BaseViewSpec getBaseViewSpec() {

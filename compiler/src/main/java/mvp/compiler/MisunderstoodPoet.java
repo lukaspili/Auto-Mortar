@@ -20,7 +20,6 @@ import javax.lang.model.element.VariableElement;
 import dagger.Component;
 import dagger.Module;
 import dagger.Provides;
-import flow.Layout;
 import mvp.ComponentFactory;
 import mvp.ScreenScope;
 import mvp.compiler.model.InjectableVariableElement;
@@ -186,10 +185,6 @@ public class MisunderstoodPoet {
     }
 
     private TypeSpec.Builder createScreenBuilder(ScreenSpec screenSpec) {
-        AnnotationSpec layoutAnnotationSpec = AnnotationSpec.builder(Layout.class)
-                .addMember("value", "$L", screenSpec.getLayout())
-                .build();
-
         AnnotationSpec generatedAnnotationSpec = AnnotationSpec.builder(Generated.class)
                 .addMember("value", "$S", AnnotationProcessor.class.getName())
                 .build();
@@ -210,7 +205,6 @@ public class MisunderstoodPoet {
                 .addSuperinterface(ParameterizedTypeName.get(ClassName.get(ComponentFactory.class), screenSpec.getComponentSpec().getParentTypeName()))
                 .superclass(screenSpec.getSuperclassTypeName())
                 .addAnnotation(generatedAnnotationSpec)
-                .addAnnotation(layoutAnnotationSpec)
                 .addMethod(createComponentMethod);
 
         List<VariableElement> constructorParameters = new ArrayList<>();
@@ -229,6 +223,13 @@ public class MisunderstoodPoet {
                 constructorBuilder.addStatement("this.$L = $L", variableElement.getSimpleName().toString(), variableElement.getSimpleName().toString());
             }
             builder.addMethod(constructorBuilder.build());
+        }
+
+        if (screenSpec.getLayoutAnnotationClassName() != null && screenSpec.getLayout() != 0) {
+            AnnotationSpec layoutAnnotationSpec = AnnotationSpec.builder(screenSpec.getLayoutAnnotationClassName())
+                    .addMember("value", "$L", screenSpec.getLayout())
+                    .build();
+            builder.addAnnotation(layoutAnnotationSpec);
         }
 
         return builder;
