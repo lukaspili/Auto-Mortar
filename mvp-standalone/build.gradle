@@ -3,16 +3,6 @@ apply plugin: 'java'
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
 
-configurations {
-    provided
-}
-
-sourceSets {
-    main {
-        compileClasspath += configurations.provided
-    }
-}
-
 dependencies {
     compile project(':library')
 }
