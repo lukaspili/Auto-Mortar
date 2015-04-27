@@ -436,7 +436,7 @@ dependencies {
     compile 'com.github.lukaspili.mvp:mvp-flownavigation:0.1.0'
     
     // OR use this for standalone Mortar-MVP
-    compile 'com.github.lukaspili.mvp:mvp:0.1.0'
+    compile 'com.github.lukaspili.mvp:mvp-standalone:0.1.0'
 }
 ```
 
