@@ -1,0 +1,41 @@
+ext.deps = [
+        android_gradle_plugin: 'com.android.tools.build:gradle:1.1.0',
+
+        flow: 'com.github.lukaspili.flow:flow:0.9-2',
+        flow_path: 'com.github.lukaspili.flow:flow-path:0.9-2',
+        flow_navigation: 'flow-navigation:flow-navigation:0.1-SNAPSHOT',
+        dagger2: 'com.google.dagger:dagger:2.0',
+        dagger2_compiler: 'com.google.dagger:dagger-compiler:2.0',
+        javax_annotation_jsr250: 'javax.annotation:jsr250-api:1.0',
+        mortar: 'com.squareup.mortar:mortar:0.17-SNAPSHOT',
+        mortar_dagger2support: 'com.squareup.mortar:dagger2support:0.17-SNAPSHOT'
+]
+ext.minSdkVersion = 14
+ext.targetSdkVersion = 21
+ext.compileSdkVersion = 21
+ext.buildToolsVersion = '21.1.2'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}
+
+subprojects {
+    buildscript {
+        repositories {
+            mavenCentral()
+        }
+    }
+
+    repositories {
+        maven { url "http://oss.sonatype.org/content/repositories/snapshots" }
+        maven { url "https://jitpack.io" }
+        mavenCentral()
+        mavenLocal()
+    }
+
+    group = GROUP
+    version = VERSION_NAME
+
+    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
+}

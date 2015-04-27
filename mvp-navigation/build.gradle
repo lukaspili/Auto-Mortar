@@ -1,0 +1,33 @@
+apply plugin: 'java'
+
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'
+
+configurations {
+    provided
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.provided
+    }
+}
+
+dependencies {
+    compile project(':library')
+    compile deps.flow
+    compile deps.flow_navigation
+    compile deps.mortar
+    compile deps.mortar_dagger2support
+
+    provided 'com.google.android:android:4.1.1.4'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = POM_ARTIFACT_ID
+            from components.java
+        }
+    }
+}

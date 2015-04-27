@@ -1,0 +1,68 @@
+buildscript {
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+    }
+}
+
+buildscript {
+    dependencies {
+        classpath deps.android_gradle_plugin
+    }
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    defaultConfig {
+
+    }
+
+    defaultConfig {
+        applicationId "mvp.sample"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName VERSION_NAME
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+
+dependencies {
+    apt project(':compiler')
+    compile project(':mvp-navigation')
+
+    compile 'com.android.support:support-v4:22.0.0'
+    compile 'com.android.support:recyclerview-v7:22.0.0'
+
+    compile deps.mortar
+    compile deps.mortar_dagger2support
+
+    compile deps.flow
+    compile deps.flow_path
+
+    compile deps.dagger2
+    apt deps.dagger2_compiler
+    provided deps.javax_annotation_jsr250
+
+    compile 'com.jakewharton:butterknife:6.1.0'
+    compile 'com.jakewharton.timber:timber:2.7.1'
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+}

@@ -1,0 +1,32 @@
+apply plugin: 'java'
+
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'
+
+dependencies {
+    compile project(':library')
+    compile project(':mvp-navigation')
+    compile project(':mvp-flowpath')
+
+    compile 'com.google.auto:auto-common:0.4'
+    compile 'com.google.auto.service:auto-service:1.0-rc2'
+    compile 'com.google.guava:guava:18.0'
+    compile 'com.squareup:javapoet:1.0.0'
+
+    compile deps.dagger2
+
+    compile deps.flow
+    compile deps.flow_path
+
+    compile deps.mortar
+    compile deps.mortar_dagger2support
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = POM_ARTIFACT_ID
+            from components.java
+        }
+    }
+}

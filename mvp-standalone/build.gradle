@@ -1,0 +1,27 @@
+apply plugin: 'java'
+
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'
+
+configurations {
+    provided
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.provided
+    }
+}
+
+dependencies {
+    compile project(':library')
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = POM_ARTIFACT_ID
+            from components.java
+        }
+    }
+}

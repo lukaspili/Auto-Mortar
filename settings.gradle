@@ -1,0 +1,6 @@
+include ':compiler',
+        ':library',
+        ':mvp-navigation',
+        ':mvp-flowpath',
+        ':mvp-standalone',
+        ':sample'
