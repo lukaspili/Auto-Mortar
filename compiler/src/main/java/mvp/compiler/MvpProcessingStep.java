@@ -254,6 +254,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
     }
 
     private boolean validateSpecs(List<ScreenSpec> screenSpecs) {
+        // TODO: add validation
         return true;
     }
 
