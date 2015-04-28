@@ -48,10 +48,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:22.0.0'
 
     compile deps.mortar
-    compile deps.mortar_dagger2support
-
     compile deps.flow
-    compile deps.flow_path
 
     compile deps.dagger2
     apt deps.dagger2_compiler

@@ -377,6 +377,12 @@ Each generated screen, and its associated component and presenter will be scoped
 ScreenScope is a dagger scope annotation provided by Mortar MVP.
 
 
+### DaggerService
+
+Since Mortar 0.17, the dagger2support was removed.  
+Mortar MVP provides a `DaggerService` class that works pretty much the same like the old one.
+
+
 ## Library extensions
 
 Each generated screen can extend from a superclass.  
@@ -447,17 +453,6 @@ dependencies {
 }
 ```
 
-Mortar MVP uses an alternative dependency for Mortar, which is up-to-date with the latest commit, also hosted on sonatype ([https://github.com/lukaspili/mortar](https://github.com/lukaspili/mortar)).
-
-```groovy
-repositories {
-	maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-}
-
-dependencies {
-	compile 'com.github.lukaspili:mortar:0.17-SNAPSHOT'
-}
-```
 
 ## Status
 

@@ -15,4 +15,5 @@ sourceSets {
 
 dependencies {
     provided 'javax.inject:javax.inject:1'
+    provided deps.android
 }

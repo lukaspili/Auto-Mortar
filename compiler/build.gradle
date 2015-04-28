@@ -20,5 +20,4 @@ dependencies {
     compile deps.flow_navigation
 
     compile deps.mortar
-    compile deps.mortar_dagger2support
 }

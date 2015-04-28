@@ -7,7 +7,7 @@ import com.squareup.javapoet.ClassName;
 import javax.lang.model.element.Element;
 
 import flownavigation.path.Path;
-import mortar.dagger2support.DaggerService;
+import mvp.DaggerService;
 
 /**
  * All the logic about class names for a specific element in one place

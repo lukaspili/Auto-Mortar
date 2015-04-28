@@ -18,7 +18,7 @@ import flownavigation.path.Path;
 import flownavigation.path.PathContainerView;
 import mortar.MortarScope;
 import mortar.bundler.BundleServiceRunner;
-import mortar.dagger2support.DaggerService;
+import mvp.DaggerService;
 import mvp.sample.R;
 import mvp.sample.app.ActivityScope;
 import mvp.sample.app.App;

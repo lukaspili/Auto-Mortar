@@ -5,8 +5,8 @@ import android.util.Log;
 
 import flownavigation.path.Path;
 import mortar.MortarScope;
-import mortar.dagger2support.DaggerService;
 import mvp.ComponentFactory;
+import mvp.DaggerService;
 
 /**
  * @author Lukasz Piliszczuk - lukasz.pili@gmail.com

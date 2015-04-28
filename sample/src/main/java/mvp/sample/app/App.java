@@ -3,14 +3,13 @@ package mvp.sample.app;
 import android.app.Application;
 import android.content.Context;
 
-import mvp.sample.BuildConfig;
-import mvp.sample.rest.RestClient;
-
 import javax.inject.Singleton;
 
 import dagger.Provides;
 import mortar.MortarScope;
-import mortar.dagger2support.DaggerService;
+import mvp.DaggerService;
+import mvp.sample.BuildConfig;
+import mvp.sample.rest.RestClient;
 import timber.log.Timber;
 
 public class App extends Application {

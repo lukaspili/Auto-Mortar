@@ -18,9 +18,8 @@ dependencies {
     compile deps.flow
     compile deps.flow_navigation
     compile deps.mortar
-    compile deps.mortar_dagger2support
 
-    provided 'com.google.android:android:4.1.1.4'
+    provided deps.android
 }
 
 apply from: '../mvn-publish.gradle'
