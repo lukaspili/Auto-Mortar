@@ -22,3 +22,5 @@ dependencies {
 
     compile deps.mortar
 }
+
+apply from: '../mvn-publish.gradle'
