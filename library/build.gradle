@@ -17,3 +17,5 @@ dependencies {
     provided 'javax.inject:javax.inject:1'
     provided deps.android
 }
+
+apply from: '../mvn-publish.gradle'

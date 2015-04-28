@@ -442,14 +442,14 @@ repositories {
 dependencies {
     apt 'com.github.lukaspili:mvp-compiler:0.1-SNAPSHOT'
     
-    // use this for Flow-path
-    compile 'com.github.lukaspili:mvp-flowpath:0.1-SNAPSHOT'
+    // use this for mortar-mvp with Flow-path
+    compile 'com.github.lukaspili:mortar-mvp-flowpath:0.1-SNAPSHOT'
     
-    // OR use this for Flow navigation
-    compile 'com.github.lukaspili:mvp-flownavigation:0.1-SNAPSHOT'
+    // OR use this for mortar-mvp with Flow navigation
+    compile 'com.github.lukaspili:mortar-mvp-flownavigation:0.1-SNAPSHOT'
     
     // OR use this for standalone Mortar-MVP
-    compile 'com.github.lukaspili:mvp-standalone:0.1-SNAPSHOT'
+    compile 'com.github.lukaspili:mortar-mvp-standalone:0.1-SNAPSHOT'
 }
 ```
 
