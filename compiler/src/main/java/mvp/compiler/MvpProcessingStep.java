@@ -70,7 +70,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
 
     @Override
     public Set<? extends Class<? extends Annotation>> annotations() {
-        return ImmutableSet.<Class<? extends Annotation>>of(MVP.class, mvp.flowpath.MVP.class);
+        return ImmutableSet.<Class<? extends Annotation>>of(MVP.class, mvp.flowpath.MVP.class, mvp.standalone.MVP.class);
     }
 
     @Override
