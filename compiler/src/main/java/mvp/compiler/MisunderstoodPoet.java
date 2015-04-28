@@ -116,6 +116,15 @@ public class MisunderstoodPoet {
         }
         onDetachedFromWindowBuilder.addStatement("super.onDetachedFromWindow()");
 
+        // onFinishInflate
+        MethodSpec onFinishInflateMethodSpec = MethodSpec.methodBuilder("onFinishInflate")
+                .addModifiers(Modifier.PROTECTED)
+                .returns(void.class)
+                .addAnnotation(Override.class)
+                .addStatement("super.onFinishInflate()")
+                .addStatement("$T.inject(this)", ClassNames.butterknife())
+                .build();
+
         return TypeSpec.classBuilder(baseViewSpec.getClassName().simpleName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.ABSTRACT)
                 .superclass(baseViewSpec.getSuperclassTypeName())
@@ -127,13 +136,7 @@ public class MisunderstoodPoet {
                 .addMethod(constructor2)
                 .addMethod(constructor3)
                 .addMethod(init)
-                .addMethod(MethodSpec.methodBuilder("onFinishInflate")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(void.class)
-                        .addAnnotation(Override.class)
-                        .addStatement("super.onFinishInflate()")
-                        .addStatement("$T.inject(this)", ClassNames.butterknife())
-                        .build())
+                .addMethod(onFinishInflateMethodSpec)
                 .addMethod(onAttachedToWindowBuilder.build())
                 .addMethod(onDetachedFromWindowBuilder.build())
                 .build();
