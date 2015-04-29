@@ -14,6 +14,8 @@ sourceSets {
 }
 
 dependencies {
+    compile deps.mortar
+
     provided 'javax.inject:javax.inject:1'
     provided deps.android
 }

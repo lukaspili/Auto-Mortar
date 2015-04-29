@@ -1,5 +1,6 @@
 package mvp.navigation;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -21,5 +22,7 @@ public @interface MVP {
 
     Class<?> baseViewLayout() default void.class;
 
-    int layout() default 0;
+    Class<?> screenSuperclass() default void.class;
+
+    Class<? extends Annotation>[] screenAnnotations() default {};
 }

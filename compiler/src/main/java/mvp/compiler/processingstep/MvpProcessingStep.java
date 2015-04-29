@@ -1,7 +1,8 @@
-package mvp.compiler;
+package mvp.compiler.processingstep;
 
 import com.google.auto.common.BasicAnnotationProcessor;
 import com.google.auto.common.MoreElements;
+import com.google.auto.common.MoreTypes;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -18,19 +19,24 @@ import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.Filer;
 import javax.inject.Inject;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import flownavigation.path.Path;
-import flownavigation.view.Layout;
 import mvp.ScreenParam;
+import mvp.compiler.MisunderstoodPoet;
+import mvp.compiler.extractor.ConfigurationExtractor;
 import mvp.compiler.extractor.ElementExtractor;
 import mvp.compiler.message.Message;
 import mvp.compiler.message.MessageDelivery;
@@ -38,6 +44,7 @@ import mvp.compiler.model.InjectableVariableElement;
 import mvp.compiler.model.spec.BaseViewSpec;
 import mvp.compiler.model.spec.ComponentSpec;
 import mvp.compiler.model.spec.ModuleSpec;
+import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
 import mvp.compiler.names.ClassNames;
 import mvp.compiler.names.Textes;
@@ -52,9 +59,10 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
     private final Elements elements;
     private final Filer filer;
     private final MessageDelivery messageDelivery;
+    private final ProcessingStepsBus processingStepsBus;
     private final MisunderstoodPoet misunderstoodPoet;
 
-    public MvpProcessingStep(Types types, Elements elements, Filer filer, MessageDelivery messageDelivery) {
+    public MvpProcessingStep(Types types, Elements elements, Filer filer, MessageDelivery messageDelivery, ProcessingStepsBus processingStepsBus) {
         Preconditions.checkNotNull(types);
         Preconditions.checkNotNull(elements);
         Preconditions.checkNotNull(filer);
@@ -64,6 +72,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         this.elements = elements;
         this.filer = filer;
         this.messageDelivery = messageDelivery;
+        this.processingStepsBus = processingStepsBus;
 
         misunderstoodPoet = new MisunderstoodPoet();
     }
@@ -76,12 +85,20 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
     @Override
     public void process(SetMultimap<Class<? extends Annotation>, Element> elementsByAnnotation) {
 
+        // get configuration if provided, or the default one
+        ConfigurationExtractor configurationExtractor = processingStepsBus.getConfigurationExtractor();
+        if (configurationExtractor == null) {
+            try {
+                configurationExtractor = new ConfigurationExtractor();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
+        }
+
         List<ScreenSpec> screenSpecs = new ArrayList<>();
 
         for (Class<? extends Annotation> annotation : elementsByAnnotation.keySet()) {
-            // @MVP can come from flow-navigation or flow-path
-            boolean fromFlowNavigation = annotation.equals(MVP.class);
-
             Set<Element> elements = elementsByAnnotation.get(annotation);
             for (Element element : elements) {
                 ElementExtractor elementExtractor = new ElementExtractor(element, annotation, types, this.elements);
@@ -92,9 +109,14 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
                     continue;
                 }
 
+//                System.out.println("ZOBZOB");
+//                for(AnnotationMirror mirror : element.getAnnotationMirrors()) {
+//                    System.out.println(mirror.getAnnotationType().asElement().getSimpleName());
+//                }
+
                 ClassNames classNames = new ClassNames(elementExtractor.getElement());
 
-                ScreenSpec screenSpec = buildScreen(elementExtractor, classNames);
+                ScreenSpec screenSpec = buildScreen(elementExtractor, classNames, configurationExtractor);
                 Preconditions.checkNotNull(screenSpec);
                 screenSpecs.add(screenSpec);
             }
@@ -106,23 +128,38 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         }
     }
 
-    private ScreenSpec buildScreen(ElementExtractor elementExtractor, ClassNames classNames) {
+    private ScreenSpec buildScreen(ElementExtractor elementExtractor, ClassNames classNames, ConfigurationExtractor configurationExtractor) {
         Preconditions.checkNotNull(elementExtractor);
         Preconditions.checkNotNull(classNames);
 
         ScreenSpec screenSpec = new ScreenSpec(classNames.getScreenClassName(), elementExtractor.getElement());
-        screenSpec.setLayout(elementExtractor.getLayout());
         screenSpec.setDaggerComponentTypeName(classNames.getDaggerComponentClassName());
 
-        // screen superclass and layout annotation
-        if (elementExtractor.getMvpAnnotationSource() == ElementExtractor.MvpAnnotationSource.FLOW_NAVIGATION) {
-            screenSpec.setSuperclassTypeName(ClassName.get(Path.class));
-            screenSpec.setLayoutAnnotationClassName(ClassName.get(Layout.class));
-        } else if (elementExtractor.getMvpAnnotationSource() == ElementExtractor.MvpAnnotationSource.FLOW_PATH) {
-            screenSpec.setSuperclassTypeName(ClassName.get(flow.path.Path.class));
-            screenSpec.setLayoutAnnotationClassName(ClassName.get(mvp.flowpath.Layout.class));
-        } else if (elementExtractor.getScreenSuperclassTypeMirror() != null) {
-            screenSpec.setSuperclassTypeName(TypeName.get(elementExtractor.getScreenSuperclassTypeMirror()));
+        // screen superclass, first let's see if user specified a superclass on @MVP
+        // otherwise use config
+        // if config provides null, screen will have no superclass
+        if (elementExtractor.getScreenSuperclassTypeMirror() != null) {
+            screenSpec.setSuperclassTypeName(ClassName.get(elementExtractor.getScreenSuperclassTypeMirror()));
+        } else if (configurationExtractor.getScreenSuperclassTypeName() != null) {
+            screenSpec.setSuperclassTypeName(ClassName.get(configurationExtractor.getScreenSuperclassTypeName()));
+        }
+
+        // screen annotations
+        List<ScreenAnnotationSpec> annotationSpecs = new ArrayList<>();
+        for (AnnotationMirror annotationTypeMirror : elementExtractor.getScreenAnnotationsMirrors()) {
+            Element e = MoreTypes.asElement(annotationTypeMirror.getAnnotationType());
+            TypeElement te = MoreElements.asType(e);
+            ScreenAnnotationSpec spec = new ScreenAnnotationSpec(ClassName.get(te));
+            annotationSpecs.add(spec);
+
+            Map<? extends ExecutableElement, ? extends AnnotationValue> map = annotationTypeMirror.getElementValues();
+            for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : map.entrySet()) {
+                spec.getMembers().put(entry.getKey().getSimpleName().toString(), entry.getValue());
+            }
+        }
+
+        if (!annotationSpecs.isEmpty()) {
+            screenSpec.setAnnotationSpecs(annotationSpecs);
         }
 
 
@@ -242,11 +279,6 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
 
         if (elementExtractor.getParentComponentTypeMirror() == null) {
             messageDelivery.add(Message.error(elementExtractor.getElement(), "@MVP requires parentComponent to be defined."));
-            return false;
-        }
-
-        if (elementExtractor.getLayout() == 0) {
-            messageDelivery.add(Message.error(elementExtractor.getElement(), "@MVP requires layout to be defined."));
             return false;
         }
 

@@ -11,6 +11,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Generated;
 import javax.inject.Inject;
@@ -21,13 +22,14 @@ import dagger.Component;
 import dagger.Module;
 import dagger.Provides;
 import mvp.ComponentFactory;
-import mvp.ScreenScope;
 import mvp.compiler.model.InjectableVariableElement;
 import mvp.compiler.model.spec.BaseViewSpec;
 import mvp.compiler.model.spec.ComponentSpec;
 import mvp.compiler.model.spec.ModuleSpec;
+import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
 import mvp.compiler.names.ClassNames;
+import mvp.scope.ScreenScope;
 
 /**
  * Actually it generates readable and understandable code!
@@ -206,9 +208,22 @@ public class MisunderstoodPoet {
         TypeSpec.Builder builder = TypeSpec.classBuilder(screenSpec.getClassName().simpleName())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addSuperinterface(ParameterizedTypeName.get(ClassName.get(ComponentFactory.class), screenSpec.getComponentSpec().getParentTypeName()))
-                .superclass(screenSpec.getSuperclassTypeName())
                 .addAnnotation(generatedAnnotationSpec)
                 .addMethod(createComponentMethod);
+
+        if (screenSpec.getSuperclassTypeName() != null) {
+            builder.superclass(screenSpec.getSuperclassTypeName());
+        }
+
+        if (screenSpec.getAnnotationSpecs() != null) {
+            for (ScreenAnnotationSpec annotationSpec : screenSpec.getAnnotationSpecs()) {
+                AnnotationSpec.Builder annotationSpecBuilder = AnnotationSpec.builder(annotationSpec.getClassName());
+                for (Map.Entry<String, Object> entry : annotationSpec.getMembers().entrySet()) {
+                    annotationSpecBuilder.addMember(entry.getKey(), "$L", entry.getValue());
+                }
+                builder.addAnnotation(annotationSpecBuilder.build());
+            }
+        }
 
         List<VariableElement> constructorParameters = new ArrayList<>();
         for (InjectableVariableElement injectableVariableElement : screenSpec.getScreenParamMembers()) {
@@ -228,12 +243,12 @@ public class MisunderstoodPoet {
             builder.addMethod(constructorBuilder.build());
         }
 
-        if (screenSpec.getLayoutAnnotationClassName() != null && screenSpec.getLayout() != 0) {
-            AnnotationSpec layoutAnnotationSpec = AnnotationSpec.builder(screenSpec.getLayoutAnnotationClassName())
-                    .addMember("value", "$L", screenSpec.getLayout())
-                    .build();
-            builder.addAnnotation(layoutAnnotationSpec);
-        }
+//        if (screenSpec.getLayoutAnnotationClassName() != null && screenSpec.getLayout() != 0) {
+//            AnnotationSpec layoutAnnotationSpec = AnnotationSpec.builder(screenSpec.getLayoutAnnotationClassName())
+//                    .addMember("value", "$L", screenSpec.getLayout())
+//                    .build();
+//            builder.addAnnotation(layoutAnnotationSpec);
+//        }
 
         return builder;
     }

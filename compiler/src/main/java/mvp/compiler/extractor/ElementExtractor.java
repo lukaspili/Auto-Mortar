@@ -3,14 +3,16 @@ package mvp.compiler.extractor;
 import com.google.common.base.Optional;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-
-import mvp.navigation.MVP;
 
 /**
  * Extract and holds the useful data from Element
@@ -24,8 +26,8 @@ public class ElementExtractor {
     private static final String MVP_VIEW_BASE_LAYOUT = "baseViewLayout";
     private static final String MVP_VIEW = "view";
     private static final String MVP_PARENT_COMPONENT = "parentComponent";
-    private static final String MVP_LAYOUT = "layout";
     private static final String MVP_SCREEN_SUPERCLASS = "screenSuperclass";
+    private static final String MVP_SCREEN_ANNOTATIONS = "screenAnnotations";
 
     private final Element element;
     private final TypeMirror viewTypeMirror;
@@ -33,8 +35,7 @@ public class ElementExtractor {
     private final TypeMirror parentComponentTypeMirror;
     private final TypeMirror elementParameterizedType;
     private final TypeMirror screenSuperclassTypeMirror;
-    private final int layout;
-    private final MvpAnnotationSource mvpAnnotationSource;
+    private final List<AnnotationMirror> screenAnnotationsMirrors;
 
     public ElementExtractor(Element element, Class<? extends Annotation> annotation, Types types, Elements elements) {
         this.element = element;
@@ -43,31 +44,26 @@ public class ElementExtractor {
         viewBaseLayoutTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_VIEW_BASE_LAYOUT);
         parentComponentTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_PARENT_COMPONENT);
         elementParameterizedType = extractParameterizedType(types, elements);
+        screenSuperclassTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_SCREEN_SUPERCLASS);
 
-        if (annotation.equals(MVP.class)) {
-            mvpAnnotationSource = MvpAnnotationSource.FLOW_NAVIGATION;
-            screenSuperclassTypeMirror = null;
-        } else if (annotation.equals(mvp.flowpath.MVP.class)) {
-            mvpAnnotationSource = MvpAnnotationSource.FLOW_PATH;
-            screenSuperclassTypeMirror = null;
-        } else {
-            mvpAnnotationSource = MvpAnnotationSource.STANDALONE;
-            screenSuperclassTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_SCREEN_SUPERCLASS);
+        screenAnnotationsMirrors = new ArrayList<>();
+        List<AnnotationValue> screenAnnotations = Utils.getValueFromAnnotation(element, annotation, MVP_SCREEN_ANNOTATIONS);
+        if (screenAnnotations != null) {
+            // for each annotations on element
+            for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
+                // for each annotation decalred in @MVP screenAnnotations
+                for (AnnotationValue value : screenAnnotations) {
+                    TypeMirror tm = (TypeMirror) value.getValue();
+                    boolean sameType = types.isSameType(mirror.getAnnotationType(), tm);
+                    if (sameType) {
+                        // if annotation is declared in @MVP screenAnnotations, take it
+                        screenAnnotationsMirrors.add(mirror);
+                        break;
+                    }
+                }
+            }
         }
-
-        Integer layout = Utils.getValueFromAnnotation(element, annotation, MVP_LAYOUT);
-        this.layout = layout != null ? layout : 0;
-
-
     }
-
-//    private int extractLayout(Class<? extends Annotation> annotation) {
-//        if (mvpAnnotationSource == MvpAnnotationSource.FLOW_NAVIGATION) {
-//            return element.getAnnotation(MVP.class).layout();
-//        } else {
-//            return element.getAnnotation(mvp.flowpath.MVP.class).layout();
-//        }
-//    }
 
     /**
      * Iterate over @MVP annotated presenter superclasses until it finds the ViewPresenter<?> parameterized type
@@ -113,19 +109,11 @@ public class ElementExtractor {
         return elementParameterizedType;
     }
 
-    public int getLayout() {
-        return layout;
-    }
-
-    public MvpAnnotationSource getMvpAnnotationSource() {
-        return mvpAnnotationSource;
-    }
-
     public TypeMirror getScreenSuperclassTypeMirror() {
         return screenSuperclassTypeMirror;
     }
 
-    public enum MvpAnnotationSource {
-        FLOW_PATH, FLOW_NAVIGATION, STANDALONE
+    public List<AnnotationMirror> getScreenAnnotationsMirrors() {
+        return screenAnnotationsMirrors;
     }
 }

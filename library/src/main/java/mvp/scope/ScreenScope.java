@@ -1,4 +1,4 @@
-package mvp;
+package mvp.scope;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

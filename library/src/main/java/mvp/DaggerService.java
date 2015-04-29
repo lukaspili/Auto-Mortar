@@ -7,7 +7,7 @@ import android.content.Context;
  */
 public class DaggerService {
 
-    public static final String SERVICE_NAME = DaggerService.class.getName();
+    public static final String SERVICE_NAME = "mvp.DaggerService";
 
     /**
      * Caller is required to know the type of the component for this context.

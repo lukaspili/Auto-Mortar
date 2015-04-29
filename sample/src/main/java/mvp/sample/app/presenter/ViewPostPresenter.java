@@ -18,8 +18,7 @@ import mvp.sample.ui.view.ViewPostView;
  */
 @MVP(
         parentComponent = RootActivity.Component.class,
-        baseViewLayout = LinearLayout.class,
-        layout = R.layout.screen_view_post
+        baseViewLayout = LinearLayout.class
 )
 public class ViewPostPresenter extends ViewPresenter<ViewPostView> {
 

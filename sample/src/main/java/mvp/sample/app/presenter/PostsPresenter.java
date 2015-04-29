@@ -10,6 +10,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import flow.Flow;
+import flownavigation.view.Layout;
 import mortar.ViewPresenter;
 import mvp.navigation.MVP;
 import mvp.sample.R;
@@ -29,8 +30,9 @@ import timber.log.Timber;
 @MVP(
         parentComponent = RootActivity.Component.class,
         baseViewLayout = FrameLayout.class,
-        layout = R.layout.screen_posts
+        screenAnnotations = Layout.class
 )
+@Layout(R.layout.screen_posts)
 public class PostsPresenter extends ViewPresenter<PostsView> implements PostAdapter.Listener {
 
     private final RestClient restClient;
