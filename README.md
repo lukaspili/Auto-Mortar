@@ -423,7 +423,7 @@ repositories {
 }
 
 dependencies {
-    apt 'com.github.lukaspili:mvp-compiler:0.2-SNAPSHOT'
+    apt 'com.github.lukaspili:mortar-mvp-compiler:0.2-SNAPSHOT'
     compile 'com.github.lukaspili:mortar-mvp:0.2-SNAPSHOT'
 }
 ```
