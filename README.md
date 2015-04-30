@@ -88,9 +88,10 @@ public class ShowUserView extends LinearLayout {
 
 @MVP(
         parentComponent = RootActivity.Component.class,
-        baseViewLayout = LinearLayout.class
-        layout = R.layout.screen_show_user
+        baseViewLayout = LinearLayout.class,
+        screenAnnotations = Layout.class
 )
+@Layout(R.layout.screen_show_user)
 public class ShowUserPresenter extends ViewPresenter<MVP_ShowUserScreen.View> {
 
     private final String username;
@@ -145,24 +146,25 @@ Depending which library extension you use, the screen will extend from flow.path
 
 The screen contains all the other associated generated classes (Component, Module, View).
 
-The generated screen can be annoted with `@Layout` annotation (from mvp-flowpath or mvp-flownavigation). If you want this annotation to be applied on the screen, define the attribute **layout** on the `@MVP` annotation, and its value will be provided to the `@Layout` annotation.
+The generated screen can be annoted with your custom annotation.  
+In order to do so, you have to first annotate the presenter with that annotation, and then specify the annotation class in `@MVP screenAnnotations` member.
+
+For instance, if you have a `@Layout` annotation you want to apply on the generated screen:
 
 ```java
 @MVP(
-	layout = R.layout.my_layout
+	screenAnnotations = Layout.class
 )
+@Layout(R.layout.my_layout)
+public class ViewPostPresenter {}
 ```
 
-The generated screen looks like:
+The generated screen will look like:
 
 ```java
-
 @Generated("mvp.compiler.AnnotationProcessor")
 @Layout(2130903043) // equals to R.layout.my_layout
-public final class MVP_PostsScreen extends Path implements ComponentFactory<RootActivity.Component> {
-
-    // ...
-}
+public final class MVP_PostsScreen {}
 ```
 
 In order to use the screen instance, like in navigation between screens with Flow, use:  
@@ -305,6 +307,20 @@ To resume the different uses:
 
 ## More uses
 
+### Configuration
+
+You can also customize the code generation through a configuration annotation.  
+Create a new empty interface (or class), and annotate it with `@MvpConfiguration`. All configuration options are exposed as members of `@MvpConfiguration`.
+
+```java
+@MvpConfiguration(
+	screenSuperclass = Path.class // all generated screens will extend from Path
+)
+interface MvpConfig { }
+```
+
+If you don't provide a configuration, the default will be used (see `mvp.config.DefaultMvpConfiguration`). And you can't have several configurations in the current version.
+
 ### Passing parameters between screens
 
 When you navigate from one screen to another, you often want to pass some parameters.  
@@ -383,39 +399,6 @@ Since Mortar 0.17, the dagger2support was removed.
 Mortar MVP provides a `DaggerService` class that works pretty much the same like the old one.
 
 
-## Library extensions
-
-Each generated screen can extend from a superclass.  
-The superclass may be:
-
-- **flow.path.Path** if you want to use the flow-path additional library from Flow.  
-- **flownavigation.path.Path** if you want to use the Flow navigation library, which is an alternative to flow-path.  
-- Any custom class of yours, or none.
-
-Thus, `@MVP` annotation is available in three library extensions, depending which one you want to use. Each extension provides its own `@MVP` annotation. 
-
-#### mvp-flowpath  
-
-Use `@MVP` from package mvp.flowpath, in order to generate screen that will extend from flow.path.Path.  
-In addition, this extension provides a `@Layout` annotation that will be applied on the generated screens (`@Layout` was recently moved from Flow core library into its sample).
-
-#### mvp-flownavigation
-
-Use `@MVP` from package mvp.navigation, in order to generate screen that will extend from flownavigation.path.Path.  
-In addition, this extension provides the following classes to speed up the setup with Mortar and Flow:
-
-- MortarContextFactory
-- MortarPathContainerView
-- ScreenScoper
-
-It also applies `@Layout` annotation on the generated screens (the annotation is provided by flow navigation library).
-
-
-#### mvp-standalone
-
-Use `@MVP` from package mvp.standalone, in order to generate screen that extend from a custom class. This particular `@MVP` annotation defines a `screenSuperclass` attribute. By default it's none.
-
-
 ## Installation
 
 Gradle apt plugin recommended, like for dagger 2.
@@ -440,16 +423,8 @@ repositories {
 }
 
 dependencies {
-    apt 'com.github.lukaspili:mvp-compiler:0.1-SNAPSHOT'
-    
-    // use this for mortar-mvp with Flow-path
-    compile 'com.github.lukaspili:mortar-mvp-flowpath:0.1-SNAPSHOT'
-    
-    // OR use this for mortar-mvp with Flow navigation
-    compile 'com.github.lukaspili:mortar-mvp-flownavigation:0.1-SNAPSHOT'
-    
-    // OR use this for standalone Mortar-MVP
-    compile 'com.github.lukaspili:mortar-mvp-standalone:0.1-SNAPSHOT'
+    apt 'com.github.lukaspili:mvp-compiler:0.2-SNAPSHOT'
+    compile 'com.github.lukaspili:mortar-mvp:0.2-SNAPSHOT'
 }
 ```
 
@@ -461,9 +436,9 @@ Discussions and feedback welcomed, please open an issue.
 Or drop a word on gitter: [https://gitter.im/lukaspili/Mortar-MVP](https://gitter.im/lukaspili/Mortar-MVP)
 
 
-## More on Flow navigation library
+## Flow-navigation
 
-Flow navigation is another experimental library upon Flow library.  
+Flow-navigation is another experimental library upon Flow library.  
 It's an alternative to Flow-path that preserves the scopes of previous paths in navigation history. You can check it out here: [https://github.com/lukaspili/flow-navigation](https://github.com/lukaspili/flow-navigation)
 
 

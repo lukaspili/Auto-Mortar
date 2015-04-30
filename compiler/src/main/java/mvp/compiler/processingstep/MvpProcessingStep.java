@@ -34,6 +34,7 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import mvp.MVP;
 import mvp.ScreenParam;
 import mvp.compiler.MisunderstoodPoet;
 import mvp.compiler.extractor.ElementExtractor;
@@ -49,7 +50,6 @@ import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
 import mvp.compiler.names.ClassNames;
 import mvp.compiler.names.Textes;
-import mvp.navigation.MVP;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
@@ -81,7 +81,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
 
     @Override
     public Set<? extends Class<? extends Annotation>> annotations() {
-        return ImmutableSet.<Class<? extends Annotation>>of(MVP.class, mvp.flowpath.MVP.class, mvp.standalone.MVP.class);
+        return ImmutableSet.<Class<? extends Annotation>>of(MVP.class);
     }
 
     @Override

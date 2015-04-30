@@ -42,13 +42,16 @@ android {
 
 dependencies {
     apt project(':compiler')
-    compile project(':mvp-navigation')
+    compile project(':library')
 
     compile 'com.android.support:support-v4:22.0.0'
     compile 'com.android.support:recyclerview-v7:22.0.0'
 
     compile deps.mortar
     compile deps.flow
+    compile deps.flow_navigation
+    compile deps.flow_navigation_mortar
+    compile deps.flow_navigation_flow
 
     compile deps.dagger2
     apt deps.dagger2_compiler

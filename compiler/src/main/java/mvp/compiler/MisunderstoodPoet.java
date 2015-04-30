@@ -30,7 +30,7 @@ import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
 import mvp.compiler.names.ClassNames;
-import mvp.scope.ScreenScope;
+import mvp.ScreenScope;
 
 /**
  * Actually it generates readable and understandable code!

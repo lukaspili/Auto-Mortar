@@ -10,9 +10,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 import flow.Flow;
-import flownavigation.view.Layout;
+import flownavigation.common.flow.Layout;
 import mortar.ViewPresenter;
-import mvp.navigation.MVP;
+import mvp.MVP;
 import mvp.sample.R;
 import mvp.sample.app.adapter.PostAdapter;
 import mvp.sample.model.Post;
