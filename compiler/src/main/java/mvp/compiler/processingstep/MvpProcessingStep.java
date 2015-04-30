@@ -43,6 +43,7 @@ import mvp.compiler.model.Configuration;
 import mvp.compiler.model.InjectableVariableElement;
 import mvp.compiler.model.spec.BaseViewSpec;
 import mvp.compiler.model.spec.ComponentSpec;
+import mvp.compiler.model.spec.ConfigSpec;
 import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
@@ -111,10 +112,19 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
             }
         }
 
-        boolean valid = validateSpecs(screenSpecs);
+        ConfigSpec configSpec = buildConfig(configuration);
+        Preconditions.checkNotNull(configSpec, "Config spec is null");
+
+        boolean valid = validateSpecs(screenSpecs, configSpec);
         if (valid) {
-            generateSpecs(screenSpecs);
+            generateSpecs(screenSpecs, configSpec);
         }
+    }
+
+    private ConfigSpec buildConfig(Configuration configuration) {
+        ConfigSpec configSpec = new ConfigSpec(ClassNames.mvpConfig());
+        configSpec.setDaggerServiceName(configuration.getDaggerServiceName());
+        return configSpec;
     }
 
     private ScreenSpec buildScreen(ElementExtractor elementExtractor, ClassNames classNames, Configuration configuration) {
@@ -158,7 +168,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
             screenSpec.setViewTypeName(classNames.getBaseViewClassName());
 
             // generate base view
-            BaseViewSpec baseViewSpec = buildBaseView(elementExtractor, classNames);
+            BaseViewSpec baseViewSpec = buildBaseView(elementExtractor, classNames, configuration);
             Preconditions.checkNotNull(baseViewSpec);
             screenSpec.setBaseViewSpec(baseViewSpec);
         }
@@ -186,7 +196,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         return screenSpec;
     }
 
-    private BaseViewSpec buildBaseView(ElementExtractor elementExtractor, ClassNames classNames) {
+    private BaseViewSpec buildBaseView(ElementExtractor elementExtractor, ClassNames classNames, Configuration configuration) {
         Preconditions.checkNotNull(elementExtractor);
         Preconditions.checkNotNull(elementExtractor.getViewBaseLayoutTypeMirror());
 
@@ -194,6 +204,8 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         baseViewSpec.setSuperclassTypeName(TypeName.get(elementExtractor.getViewBaseLayoutTypeMirror()));
         baseViewSpec.setComponentClassName(classNames.getComponentClassName());
         baseViewSpec.setPresenterClassName(classNames.getPresenterClassName());
+
+        baseViewSpec.setButterknife(configuration.isButterknife());
 
         // get the view associated to the presenter via its parameterized type: ViewPresenter<MyView>
         // may be null if @MVP annotated presenter does not yet extend ViewPresenter<MyView>
@@ -274,23 +286,32 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         return true;
     }
 
-    private boolean validateSpecs(List<ScreenSpec> screenSpecs) {
+    private boolean validateSpecs(List<ScreenSpec> screenSpecs, ConfigSpec configSpec) {
+        Preconditions.checkNotNull(configSpec.getDaggerServiceName(), "Config dagger service name is null");
+
         // TODO: add validation
         return true;
     }
 
-    private void generateSpecs(List<ScreenSpec> screenSpecs) {
+    private void generateSpecs(List<ScreenSpec> screenSpecs, ConfigSpec configSpec) {
         for (ScreenSpec screenSpec : screenSpecs) {
             TypeSpec typeSpec = misunderstoodPoet.compose(screenSpec);
             JavaFile javaFile = JavaFile.builder(screenSpec.getClassName().packageName(), typeSpec).build();
+            write(javaFile, screenSpec.getElement());
+        }
 
-            try {
-                javaFile.writeTo(filer);
-            } catch (Exception e) {
-                StringWriter stackTrace = new StringWriter();
-                e.printStackTrace(new PrintWriter(stackTrace));
-                messageDelivery.add(Message.error(screenSpec.getElement(), "Unable to generate classes for %s. %s", screenSpec.getClassName().simpleName(), stackTrace));
-            }
+        TypeSpec typeSpec = misunderstoodPoet.compose(configSpec);
+        JavaFile javaFile = JavaFile.builder(configSpec.getClassName().packageName(), typeSpec).build();
+        write(javaFile, null);
+    }
+
+    private void write(JavaFile javaFile, Element element) {
+        try {
+            javaFile.writeTo(filer);
+        } catch (Exception e) {
+            StringWriter stackTrace = new StringWriter();
+            e.printStackTrace(new PrintWriter(stackTrace));
+            messageDelivery.add(Message.error(element, "Unable to generate class for %s. %s", javaFile.typeSpec.name, stackTrace));
         }
     }
 

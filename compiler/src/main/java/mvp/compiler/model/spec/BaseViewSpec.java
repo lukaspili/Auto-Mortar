@@ -13,6 +13,7 @@ public class BaseViewSpec extends AbstractSpec {
     private ClassName componentClassName;
     private ClassName presenterClassName;
     private String presenterMustExtendsViewPresenterWarning;
+    private boolean butterknife;
 
     public BaseViewSpec(ClassName className) {
         super(className);
@@ -56,5 +57,13 @@ public class BaseViewSpec extends AbstractSpec {
 
     public void setPresenterMustExtendsViewPresenterWarning(String presenterMustExtendsViewPresenterWarning) {
         this.presenterMustExtendsViewPresenterWarning = presenterMustExtendsViewPresenterWarning;
+    }
+
+    public boolean isButterknife() {
+        return butterknife;
+    }
+
+    public void setButterknife(boolean butterknife) {
+        this.butterknife = butterknife;
     }
 }

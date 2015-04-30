@@ -25,6 +25,7 @@ import mvp.ComponentFactory;
 import mvp.compiler.model.InjectableVariableElement;
 import mvp.compiler.model.spec.BaseViewSpec;
 import mvp.compiler.model.spec.ComponentSpec;
+import mvp.compiler.model.spec.ConfigSpec;
 import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
@@ -37,6 +38,8 @@ import mvp.scope.ScreenScope;
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
 public class MisunderstoodPoet {
+
+    private final static String CONFIG_DAGGERSERVICENAME = "DAGGER_SERVICE_NAME";
 
     public TypeSpec compose(ScreenSpec screenSpec) {
         TypeSpec.Builder screenTypeSpecBuilder = createScreenBuilder(screenSpec);
@@ -91,7 +94,7 @@ public class MisunderstoodPoet {
         MethodSpec init = MethodSpec.methodBuilder("init")
                 .addModifiers(Modifier.PROTECTED)
                 .addParameter(contextParameterSpec)
-                .addStatement("(($T)$L.getSystemService($T.SERVICE_NAME)).inject(this)", baseViewSpec.getComponentClassName(), "context", ClassNames.daggerService())
+                .addStatement("(($T)$L.getSystemService($L.$L)).inject(this)", baseViewSpec.getComponentClassName(), "context", ClassNames.mvpConfig(), CONFIG_DAGGERSERVICENAME)
                 .build();
 
         //TODO: Generate constructor4 for Android API 21
@@ -118,16 +121,7 @@ public class MisunderstoodPoet {
         }
         onDetachedFromWindowBuilder.addStatement("super.onDetachedFromWindow()");
 
-        // onFinishInflate
-        MethodSpec onFinishInflateMethodSpec = MethodSpec.methodBuilder("onFinishInflate")
-                .addModifiers(Modifier.PROTECTED)
-                .returns(void.class)
-                .addAnnotation(Override.class)
-                .addStatement("super.onFinishInflate()")
-                .addStatement("$T.inject(this)", ClassNames.butterknife())
-                .build();
-
-        return TypeSpec.classBuilder(baseViewSpec.getClassName().simpleName())
+        TypeSpec.Builder builder = TypeSpec.classBuilder(baseViewSpec.getClassName().simpleName())
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.ABSTRACT)
                 .superclass(baseViewSpec.getSuperclassTypeName())
                 .addField(FieldSpec.builder(baseViewSpec.getPresenterClassName(), "presenter")
@@ -138,10 +132,22 @@ public class MisunderstoodPoet {
                 .addMethod(constructor2)
                 .addMethod(constructor3)
                 .addMethod(init)
-                .addMethod(onFinishInflateMethodSpec)
                 .addMethod(onAttachedToWindowBuilder.build())
-                .addMethod(onDetachedFromWindowBuilder.build())
-                .build();
+                .addMethod(onDetachedFromWindowBuilder.build());
+
+        // onFinishInflate
+        if (baseViewSpec.isButterknife()) {
+            MethodSpec onFinishInflateMethodSpec = MethodSpec.methodBuilder("onFinishInflate")
+                    .addModifiers(Modifier.PROTECTED)
+                    .returns(void.class)
+                    .addAnnotation(Override.class)
+                    .addStatement("super.onFinishInflate()")
+                    .addStatement("$T.inject(this)", ClassNames.butterknife())
+                    .build();
+            builder.addMethod(onFinishInflateMethodSpec);
+        }
+
+        return builder.build();
     }
 
     public TypeSpec composeModule(ModuleSpec moduleSpec, AnnotationSpec screenScopeAnnotationSpec) {
@@ -243,13 +249,15 @@ public class MisunderstoodPoet {
             builder.addMethod(constructorBuilder.build());
         }
 
-//        if (screenSpec.getLayoutAnnotationClassName() != null && screenSpec.getLayout() != 0) {
-//            AnnotationSpec layoutAnnotationSpec = AnnotationSpec.builder(screenSpec.getLayoutAnnotationClassName())
-//                    .addMember("value", "$L", screenSpec.getLayout())
-//                    .build();
-//            builder.addAnnotation(layoutAnnotationSpec);
-//        }
-
         return builder;
+    }
+
+    public TypeSpec compose(ConfigSpec configSpec) {
+        return TypeSpec.classBuilder(configSpec.getClassName().simpleName())
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addField(FieldSpec.builder(String.class, CONFIG_DAGGERSERVICENAME, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                        .initializer("$S", configSpec.getDaggerServiceName())
+                        .build())
+                .build();
     }
 }

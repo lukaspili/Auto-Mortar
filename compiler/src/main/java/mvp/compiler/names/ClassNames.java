@@ -22,6 +22,7 @@ public class ClassNames {
     public static final String PRESENTER_NAME = "Presenter";
     public static final String COMPONENT_NAME = "Component";
     public static final String MODULE_NAME = "Module";
+    public static final String CONFIG_NAME = "MVP_Config";
 
     public static ClassName butterknife() {
         return ClassName.get("butterknife", "ButterKnife");
@@ -47,6 +48,10 @@ public class ClassNames {
         return ClassName.get(flow.path.Path.class);
     }
 
+    public static final ClassName mvpConfig() {
+        return ClassName.get("generatedmvp", CONFIG_NAME);
+    }
+
     private final Element element;
     private final String elementPackage;
     private final ClassName screenClassName;
@@ -55,6 +60,7 @@ public class ClassNames {
     private final ClassName moduleClassName;
     private final ClassName daggerComponentClassName;
     private final ClassName presenterClassName;
+
 
     public ClassNames(Element element) {
         Preconditions.checkNotNull(element);
