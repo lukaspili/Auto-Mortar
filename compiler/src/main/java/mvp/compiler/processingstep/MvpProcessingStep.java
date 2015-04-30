@@ -300,9 +300,14 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
             write(javaFile, screenSpec.getElement());
         }
 
-        TypeSpec typeSpec = misunderstoodPoet.compose(configSpec);
-        JavaFile javaFile = JavaFile.builder(configSpec.getClassName().packageName(), typeSpec).build();
-        write(javaFile, null);
+        // do not generate config classe twice, if there are multiple rounds
+        if (!processingStepsBus.isConfigGenerated()) {
+            processingStepsBus.setConfigGenerated(true);
+
+            TypeSpec typeSpec = misunderstoodPoet.compose(configSpec);
+            JavaFile javaFile = JavaFile.builder(configSpec.getClassName().packageName(), typeSpec).build();
+            write(javaFile, null);
+        }
     }
 
     private void write(JavaFile javaFile, Element element) {
