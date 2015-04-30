@@ -2,6 +2,7 @@ package mvp.compiler;
 
 import com.google.auto.common.BasicAnnotationProcessor;
 import com.google.auto.service.AutoService;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import javax.annotation.processing.Processor;
@@ -22,7 +23,7 @@ public class AnnotationProcessor extends BasicAnnotationProcessor {
     @Override
     protected Iterable<? extends ProcessingStep> initSteps() {
         return ImmutableSet.of(
-                new ConfigurationProcessingStep(processingEnv.getFiler(), messageDelivery, processingStepsBus),
+                new ConfigurationProcessingStep(messageDelivery, processingStepsBus),
                 new MvpProcessingStep(processingEnv.getTypeUtils(), processingEnv.getElementUtils(), processingEnv.getFiler(), messageDelivery, processingStepsBus)
         );
     }

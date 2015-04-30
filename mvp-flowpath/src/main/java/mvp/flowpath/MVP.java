@@ -14,12 +14,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface MVP {
 
-    //TODO: should be optional
     Class<?> parentComponent();
 
     Class<?> view() default void.class;
 
     Class<?> baseViewLayout() default void.class;
-
-    int layout() default 0;
 }

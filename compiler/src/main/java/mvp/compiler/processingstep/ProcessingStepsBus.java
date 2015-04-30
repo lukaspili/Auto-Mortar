@@ -1,19 +1,21 @@
 package mvp.compiler.processingstep;
 
-import mvp.compiler.extractor.ConfigurationExtractor;
+import mvp.compiler.model.Configuration;
 
 /**
+ * Pass data between processing steps
+ *
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
 public class ProcessingStepsBus {
 
-    private ConfigurationExtractor configurationExtractor;
+    private Configuration configuration;
 
-    public ConfigurationExtractor getConfigurationExtractor() {
-        return configurationExtractor;
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
-    public void setConfigurationExtractor(ConfigurationExtractor configurationExtractor) {
-        this.configurationExtractor = configurationExtractor;
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
     }
 }

@@ -36,10 +36,10 @@ import javax.lang.model.util.Types;
 
 import mvp.ScreenParam;
 import mvp.compiler.MisunderstoodPoet;
-import mvp.compiler.extractor.ConfigurationExtractor;
 import mvp.compiler.extractor.ElementExtractor;
 import mvp.compiler.message.Message;
 import mvp.compiler.message.MessageDelivery;
+import mvp.compiler.model.Configuration;
 import mvp.compiler.model.InjectableVariableElement;
 import mvp.compiler.model.spec.BaseViewSpec;
 import mvp.compiler.model.spec.ComponentSpec;
@@ -67,6 +67,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         Preconditions.checkNotNull(elements);
         Preconditions.checkNotNull(filer);
         Preconditions.checkNotNull(messageDelivery);
+        Preconditions.checkNotNull(processingStepsBus);
 
         this.types = types;
         this.elements = elements;
@@ -84,20 +85,13 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
 
     @Override
     public void process(SetMultimap<Class<? extends Annotation>, Element> elementsByAnnotation) {
-
-        // get configuration if provided, or the default one
-        ConfigurationExtractor configurationExtractor = processingStepsBus.getConfigurationExtractor();
-        if (configurationExtractor == null) {
-            try {
-                configurationExtractor = new ConfigurationExtractor();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return;
-            }
+        // get user configuration, or default one if none provided
+        Configuration configuration = processingStepsBus.getConfiguration();
+        if (configuration == null) {
+            configuration = Configuration.defaultConfig();
         }
 
         List<ScreenSpec> screenSpecs = new ArrayList<>();
-
         for (Class<? extends Annotation> annotation : elementsByAnnotation.keySet()) {
             Set<Element> elements = elementsByAnnotation.get(annotation);
             for (Element element : elements) {
@@ -109,14 +103,9 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
                     continue;
                 }
 
-//                System.out.println("ZOBZOB");
-//                for(AnnotationMirror mirror : element.getAnnotationMirrors()) {
-//                    System.out.println(mirror.getAnnotationType().asElement().getSimpleName());
-//                }
-
                 ClassNames classNames = new ClassNames(elementExtractor.getElement());
 
-                ScreenSpec screenSpec = buildScreen(elementExtractor, classNames, configurationExtractor);
+                ScreenSpec screenSpec = buildScreen(elementExtractor, classNames, configuration);
                 Preconditions.checkNotNull(screenSpec);
                 screenSpecs.add(screenSpec);
             }
@@ -128,7 +117,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         }
     }
 
-    private ScreenSpec buildScreen(ElementExtractor elementExtractor, ClassNames classNames, ConfigurationExtractor configurationExtractor) {
+    private ScreenSpec buildScreen(ElementExtractor elementExtractor, ClassNames classNames, Configuration configuration) {
         Preconditions.checkNotNull(elementExtractor);
         Preconditions.checkNotNull(classNames);
 
@@ -140,8 +129,8 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         // if config provides null, screen will have no superclass
         if (elementExtractor.getScreenSuperclassTypeMirror() != null) {
             screenSpec.setSuperclassTypeName(ClassName.get(elementExtractor.getScreenSuperclassTypeMirror()));
-        } else if (configurationExtractor.getScreenSuperclassTypeName() != null) {
-            screenSpec.setSuperclassTypeName(ClassName.get(configurationExtractor.getScreenSuperclassTypeName()));
+        } else if (configuration.getScreenSuperclassTypeName() != null) {
+            screenSpec.setSuperclassTypeName(configuration.getScreenSuperclassTypeName());
         }
 
         // screen annotations

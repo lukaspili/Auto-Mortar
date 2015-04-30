@@ -1,4 +1,4 @@
-package mvp.sample;
+package mvp.sample.app;
 
 import flownavigation.path.Path;
 import mvp.config.MvpConfiguration;
