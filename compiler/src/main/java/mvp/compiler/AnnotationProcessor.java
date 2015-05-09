@@ -2,14 +2,16 @@ package mvp.compiler;
 
 import com.google.auto.common.BasicAnnotationProcessor;
 import com.google.auto.service.AutoService;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import javax.annotation.processing.Processor;
 import javax.lang.model.SourceVersion;
 
 import mvp.compiler.message.MessageDelivery;
-import mvp.compiler.processingstep.*;
+import mvp.compiler.processingstep.ConfigurationProcessingStep;
+import mvp.compiler.processingstep.InjectableWithProcessingStep;
+import mvp.compiler.processingstep.MvpProcessingStep;
+import mvp.compiler.processingstep.ProcessingStepsBus;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
@@ -24,6 +26,7 @@ public class AnnotationProcessor extends BasicAnnotationProcessor {
     protected Iterable<? extends ProcessingStep> initSteps() {
         return ImmutableSet.of(
                 new ConfigurationProcessingStep(messageDelivery, processingStepsBus),
+                new InjectableWithProcessingStep(messageDelivery, processingStepsBus),
                 new MvpProcessingStep(processingEnv.getTypeUtils(), processingEnv.getElementUtils(), processingEnv.getFiler(), messageDelivery, processingStepsBus)
         );
     }

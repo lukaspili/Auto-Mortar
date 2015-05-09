@@ -31,6 +31,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
@@ -38,6 +39,7 @@ import mvp.MVP;
 import mvp.ScreenParam;
 import mvp.compiler.MisunderstoodPoet;
 import mvp.compiler.extractor.ElementExtractor;
+import mvp.compiler.extractor.InjectableWithExtractor;
 import mvp.compiler.message.Message;
 import mvp.compiler.message.MessageDelivery;
 import mvp.compiler.model.Configuration;
@@ -45,6 +47,7 @@ import mvp.compiler.model.InjectableVariableElement;
 import mvp.compiler.model.spec.BaseViewSpec;
 import mvp.compiler.model.spec.ComponentSpec;
 import mvp.compiler.model.spec.ConfigSpec;
+import mvp.compiler.model.spec.InjectableWithSpec;
 import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
@@ -92,6 +95,8 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
             configuration = Configuration.defaultConfig();
         }
 
+        List<InjectableWithExtractor> injectableWithSpecs = processingStepsBus.getInjectableWithExtractors();
+
         List<ScreenSpec> screenSpecs = new ArrayList<>();
         for (Class<? extends Annotation> annotation : elementsByAnnotation.keySet()) {
             Set<Element> elements = elementsByAnnotation.get(annotation);
@@ -106,7 +111,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
 
                 ClassNames classNames = new ClassNames(elementExtractor.getElement());
 
-                ScreenSpec screenSpec = buildScreen(elementExtractor, classNames, configuration);
+                ScreenSpec screenSpec = buildScreen(elementExtractor, classNames, configuration, injectableWithSpecs);
                 Preconditions.checkNotNull(screenSpec);
                 screenSpecs.add(screenSpec);
             }
@@ -127,7 +132,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         return configSpec;
     }
 
-    private ScreenSpec buildScreen(ElementExtractor elementExtractor, ClassNames classNames, Configuration configuration) {
+    private ScreenSpec buildScreen(ElementExtractor elementExtractor, ClassNames classNames, Configuration configuration, List<InjectableWithExtractor> injectableWithSpecs) {
         Preconditions.checkNotNull(elementExtractor);
         Preconditions.checkNotNull(classNames);
 
@@ -188,7 +193,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         Preconditions.checkNotNull(moduleSpec);
         screenSpec.setModuleSpec(moduleSpec);
 
-        ComponentSpec componentSpec = buildComponent(elementExtractor, classNames);
+        ComponentSpec componentSpec = buildComponent(elementExtractor, classNames, injectableWithSpecs);
         Preconditions.checkNotNull(componentSpec);
         componentSpec.setViewTypeName(screenSpec.getViewTypeName());
         screenSpec.setComponentSpec(componentSpec);
@@ -254,13 +259,24 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         return moduleSpec;
     }
 
-    private ComponentSpec buildComponent(ElementExtractor elementExtractor, ClassNames classNames) {
+    private ComponentSpec buildComponent(ElementExtractor elementExtractor, ClassNames classNames, List<InjectableWithExtractor> injectableWithSpecs) {
         Preconditions.checkNotNull(elementExtractor);
         Preconditions.checkNotNull(classNames);
 
         ComponentSpec componentSpec = new ComponentSpec(classNames.getComponentClassName());
         componentSpec.setParentTypeName(TypeName.get(elementExtractor.getParentComponentTypeMirror()));
         componentSpec.setModuleTypeName(classNames.getModuleClassName());
+
+        List<InjectableWithSpec> additionals = new ArrayList<>();
+        for (InjectableWithExtractor extractor : injectableWithSpecs) {
+            for (TypeMirror typeMirror : extractor.getTypeMirrors()) {
+                if (MoreTypes.equivalence().equivalent(typeMirror, elementExtractor.getElement().asType())) {
+                    String name = extractor.getElement().getSimpleName().toString().toLowerCase();
+                    additionals.add(new InjectableWithSpec(name, TypeName.get(extractor.getElement().asType())));
+                }
+            }
+        }
+        componentSpec.setAdditionalInjects(additionals);
 
         return componentSpec;
     }

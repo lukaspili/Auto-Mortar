@@ -22,15 +22,16 @@ import dagger.Component;
 import dagger.Module;
 import dagger.Provides;
 import mvp.ComponentFactory;
+import mvp.ScreenScope;
 import mvp.compiler.model.InjectableVariableElement;
 import mvp.compiler.model.spec.BaseViewSpec;
 import mvp.compiler.model.spec.ComponentSpec;
 import mvp.compiler.model.spec.ConfigSpec;
+import mvp.compiler.model.spec.InjectableWithSpec;
 import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
 import mvp.compiler.names.ClassNames;
-import mvp.ScreenScope;
 
 /**
  * Actually it generates readable and understandable code!
@@ -183,7 +184,7 @@ public class MisunderstoodPoet {
                 .addMember("modules", "$T.class", componentSpec.getModuleTypeName())
                 .build();
 
-        return TypeSpec.interfaceBuilder(componentSpec.getClassName().simpleName())
+        TypeSpec.Builder builder = TypeSpec.interfaceBuilder(componentSpec.getClassName().simpleName())
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(componentSpec.getParentTypeName())
                 .addAnnotation(componentAnnotatioSpec)
@@ -191,8 +192,18 @@ public class MisunderstoodPoet {
                 .addMethod(MethodSpec.methodBuilder("inject")
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                         .addParameter(componentSpec.getViewTypeName(), "view")
-                        .build())
-                .build();
+                        .build());
+
+        System.out.println("WORKS SO FAR");
+
+        for (InjectableWithSpec injectableWithSpec : componentSpec.getAdditionalInjects()) {
+            builder.addMethod(MethodSpec.methodBuilder("inject")
+                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .addParameter(injectableWithSpec.getTypeName(), injectableWithSpec.getName())
+                    .build());
+        }
+
+        return builder.build();
     }
 
     private TypeSpec.Builder createScreenBuilder(ScreenSpec screenSpec) {

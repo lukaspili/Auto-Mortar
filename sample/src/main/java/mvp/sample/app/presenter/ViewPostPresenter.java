@@ -13,6 +13,7 @@ import mvp.sample.R;
 import mvp.sample.model.Post;
 import mvp.sample.ui.activity.RootActivity;
 import mvp.sample.ui.view.ViewPostView;
+import timber.log.Timber;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
@@ -36,5 +37,9 @@ public class ViewPostPresenter extends ViewPresenter<ViewPostView> {
     protected void onLoad(Bundle savedInstanceState) {
         getView().titleTextView.setText(post.getTitle());
         getView().contentTextView.setText(post.getBody());
+    }
+
+    public void bannerClick() {
+        Timber.d("banner click !");
     }
 }
