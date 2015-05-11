@@ -3,6 +3,8 @@ package mvp.compiler.model.spec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
 
+import java.util.List;
+
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
@@ -11,6 +13,7 @@ public class ComponentSpec extends AbstractSpec {
     private TypeName parentTypeName;
     private TypeName moduleTypeName;
     private TypeName viewTypeName;
+    private List<WithInjectorSpec> withInjectorSpecs;
 
     public ComponentSpec(ClassName className) {
         super(className);
@@ -38,5 +41,13 @@ public class ComponentSpec extends AbstractSpec {
 
     public void setViewTypeName(TypeName viewTypeName) {
         this.viewTypeName = viewTypeName;
+    }
+
+    public List<WithInjectorSpec> getWithInjectorSpecs() {
+        return withInjectorSpecs;
+    }
+
+    public void setWithInjectorSpecs(List<WithInjectorSpec> withInjectorSpecs) {
+        this.withInjectorSpecs = withInjectorSpecs;
     }
 }

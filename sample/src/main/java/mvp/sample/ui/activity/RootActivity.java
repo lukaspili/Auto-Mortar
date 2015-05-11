@@ -18,10 +18,10 @@ import flownavigation.path.Path;
 import flownavigation.path.PathContainerView;
 import mortar.MortarScope;
 import mortar.bundler.BundleServiceRunner;
-import mvp.DaggerService;
 import mvp.sample.R;
 import mvp.sample.app.ActivityScope;
 import mvp.sample.app.App;
+import mvp.sample.app.DaggerService;
 import mvp.sample.app.presenter.MVP_PostsScreen;
 
 /**

@@ -6,9 +6,6 @@ import com.squareup.javapoet.ClassName;
 
 import javax.lang.model.element.Element;
 
-import flownavigation.path.Path;
-import mvp.DaggerService;
-
 /**
  * All the logic about class names for a specific element in one place
  *
@@ -34,18 +31,6 @@ public class ClassNames {
 
     public static ClassName attributeSet() {
         return ClassName.get("android.util", "AttributeSet");
-    }
-
-    public static ClassName daggerService() {
-        return ClassName.get(DaggerService.class);
-    }
-
-    public static ClassName flowNavigationPath() {
-        return ClassName.get(Path.class);
-    }
-
-    public static ClassName flowPathPath() {
-        return ClassName.get(flow.path.Path.class);
     }
 
     public static final ClassName mvpConfig() {

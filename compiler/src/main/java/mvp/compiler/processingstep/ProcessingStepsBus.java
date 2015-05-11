@@ -1,5 +1,8 @@
 package mvp.compiler.processingstep;
 
+import java.util.List;
+
+import mvp.compiler.extractor.WithInjectorExtractor;
 import mvp.compiler.model.Configuration;
 
 /**
@@ -9,8 +12,17 @@ import mvp.compiler.model.Configuration;
  */
 public class ProcessingStepsBus {
 
+    private List<WithInjectorExtractor> withInjectorExtractors;
     private Configuration configuration;
     private boolean configGenerated;
+
+    public List<WithInjectorExtractor> getWithInjectorExtractors() {
+        return withInjectorExtractors;
+    }
+
+    public void setWithInjectorExtractors(List<WithInjectorExtractor> withInjectorExtractors) {
+        this.withInjectorExtractors = withInjectorExtractors;
+    }
 
     public Configuration getConfiguration() {
         return configuration;

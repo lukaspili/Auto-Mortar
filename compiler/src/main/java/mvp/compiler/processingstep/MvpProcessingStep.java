@@ -14,6 +14,8 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
@@ -31,6 +33,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
@@ -38,6 +41,7 @@ import mvp.MVP;
 import mvp.ScreenParam;
 import mvp.compiler.MisunderstoodPoet;
 import mvp.compiler.extractor.ElementExtractor;
+import mvp.compiler.extractor.WithInjectorExtractor;
 import mvp.compiler.message.Message;
 import mvp.compiler.message.MessageDelivery;
 import mvp.compiler.model.Configuration;
@@ -48,6 +52,7 @@ import mvp.compiler.model.spec.ConfigSpec;
 import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
+import mvp.compiler.model.spec.WithInjectorSpec;
 import mvp.compiler.names.ClassNames;
 import mvp.compiler.names.Textes;
 
@@ -92,6 +97,8 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
             configuration = Configuration.defaultConfig();
         }
 
+        List<WithInjectorExtractor> withInjectorExtractors = processingStepsBus.getWithInjectorExtractors();
+
         List<ScreenSpec> screenSpecs = new ArrayList<>();
         for (Class<? extends Annotation> annotation : elementsByAnnotation.keySet()) {
             Set<Element> elements = elementsByAnnotation.get(annotation);
@@ -106,7 +113,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
 
                 ClassNames classNames = new ClassNames(elementExtractor.getElement());
 
-                ScreenSpec screenSpec = buildScreen(elementExtractor, classNames, configuration);
+                ScreenSpec screenSpec = buildScreen(elementExtractor, classNames, configuration, withInjectorExtractors);
                 Preconditions.checkNotNull(screenSpec);
                 screenSpecs.add(screenSpec);
             }
@@ -127,7 +134,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         return configSpec;
     }
 
-    private ScreenSpec buildScreen(ElementExtractor elementExtractor, ClassNames classNames, Configuration configuration) {
+    private ScreenSpec buildScreen(ElementExtractor elementExtractor, ClassNames classNames, Configuration configuration, List<WithInjectorExtractor> withInjectorExtractors) {
         Preconditions.checkNotNull(elementExtractor);
         Preconditions.checkNotNull(classNames);
 
@@ -188,7 +195,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         Preconditions.checkNotNull(moduleSpec);
         screenSpec.setModuleSpec(moduleSpec);
 
-        ComponentSpec componentSpec = buildComponent(elementExtractor, classNames);
+        ComponentSpec componentSpec = buildComponent(elementExtractor, classNames, withInjectorExtractors);
         Preconditions.checkNotNull(componentSpec);
         componentSpec.setViewTypeName(screenSpec.getViewTypeName());
         screenSpec.setComponentSpec(componentSpec);
@@ -254,13 +261,30 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         return moduleSpec;
     }
 
-    private ComponentSpec buildComponent(ElementExtractor elementExtractor, ClassNames classNames) {
+    private ComponentSpec buildComponent(ElementExtractor elementExtractor, ClassNames classNames, List<WithInjectorExtractor> withInjectorExtractors) {
         Preconditions.checkNotNull(elementExtractor);
         Preconditions.checkNotNull(classNames);
 
         ComponentSpec componentSpec = new ComponentSpec(classNames.getComponentClassName());
         componentSpec.setParentTypeName(TypeName.get(elementExtractor.getParentComponentTypeMirror()));
         componentSpec.setModuleTypeName(classNames.getModuleClassName());
+
+        List<WithInjectorSpec> withInjectorSpecs = new ArrayList<>();
+        for (WithInjectorExtractor extractor : withInjectorExtractors) {
+            for (TypeMirror typeMirror : extractor.getTypeMirrors()) {
+                // BUG: Types.isSameType does not work when Component has another generated component as parent
+                // types.isSameType(elementExtractor.getElement().asType(), typeMirror)
+                // Dirty fix: let's compare qualified name rather than typemirror
+                String first = elementExtractor.getElement().asType().toString();
+                String second = typeMirror.toString();
+
+                if (StringUtils.equals(first, second)) {
+//                    String name = extractor.getElement().getSimpleName().toString().toLowerCase();
+                    withInjectorSpecs.add(new WithInjectorSpec("view", TypeName.get(extractor.getElement().asType())));
+                }
+            }
+        }
+        componentSpec.setWithInjectorSpecs(withInjectorSpecs);
 
         return componentSpec;
     }

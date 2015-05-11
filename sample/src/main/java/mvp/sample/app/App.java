@@ -7,7 +7,6 @@ import javax.inject.Singleton;
 
 import dagger.Provides;
 import mortar.MortarScope;
-import mvp.DaggerService;
 import mvp.sample.BuildConfig;
 import mvp.sample.rest.RestClient;
 import timber.log.Timber;

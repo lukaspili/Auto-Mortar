@@ -22,6 +22,7 @@ import dagger.Component;
 import dagger.Module;
 import dagger.Provides;
 import mvp.ComponentFactory;
+import mvp.ScreenScope;
 import mvp.compiler.model.InjectableVariableElement;
 import mvp.compiler.model.spec.BaseViewSpec;
 import mvp.compiler.model.spec.ComponentSpec;
@@ -29,8 +30,8 @@ import mvp.compiler.model.spec.ConfigSpec;
 import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
+import mvp.compiler.model.spec.WithInjectorSpec;
 import mvp.compiler.names.ClassNames;
-import mvp.ScreenScope;
 
 /**
  * Actually it generates readable and understandable code!
@@ -183,7 +184,7 @@ public class MisunderstoodPoet {
                 .addMember("modules", "$T.class", componentSpec.getModuleTypeName())
                 .build();
 
-        return TypeSpec.interfaceBuilder(componentSpec.getClassName().simpleName())
+        TypeSpec.Builder builder = TypeSpec.interfaceBuilder(componentSpec.getClassName().simpleName())
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(componentSpec.getParentTypeName())
                 .addAnnotation(componentAnnotatioSpec)
@@ -191,13 +192,29 @@ public class MisunderstoodPoet {
                 .addMethod(MethodSpec.methodBuilder("inject")
                         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                         .addParameter(componentSpec.getViewTypeName(), "view")
-                        .build())
-                .build();
+                        .build());
+
+        for (WithInjectorSpec withInjectorSpec : componentSpec.getWithInjectorSpecs()) {
+            builder.addMethod(MethodSpec.methodBuilder("inject")
+                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .addParameter(withInjectorSpec.getTypeName(), withInjectorSpec.getName())
+                    .build());
+        }
+
+        return builder.build();
     }
 
     private TypeSpec.Builder createScreenBuilder(ScreenSpec screenSpec) {
         AnnotationSpec generatedAnnotationSpec = AnnotationSpec.builder(Generated.class)
                 .addMember("value", "$S", AnnotationProcessor.class.getName())
+                .build();
+
+        // static getComponent(Context)
+        MethodSpec getComponentMethod = MethodSpec.methodBuilder("getComponent")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(ClassNames.context(), "context")
+                .returns(screenSpec.getComponentSpec().getClassName())
+                .addStatement("return ($T) $L.getSystemService($T.$L)", screenSpec.getComponentSpec().getClassName(), "context", ClassNames.mvpConfig(), CONFIG_DAGGERSERVICENAME)
                 .build();
 
         MethodSpec createComponentMethod = MethodSpec.methodBuilder("createComponent")
@@ -215,7 +232,8 @@ public class MisunderstoodPoet {
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addSuperinterface(ParameterizedTypeName.get(ClassName.get(ComponentFactory.class), screenSpec.getComponentSpec().getParentTypeName()))
                 .addAnnotation(generatedAnnotationSpec)
-                .addMethod(createComponentMethod);
+                .addMethod(createComponentMethod)
+                .addMethod(getComponentMethod);
 
         if (screenSpec.getSuperclassTypeName() != null) {
             builder.superclass(screenSpec.getSuperclassTypeName());
@@ -253,8 +271,13 @@ public class MisunderstoodPoet {
     }
 
     public TypeSpec compose(ConfigSpec configSpec) {
+        AnnotationSpec generatedAnnotationSpec = AnnotationSpec.builder(Generated.class)
+                .addMember("value", "$S", AnnotationProcessor.class.getName())
+                .build();
+
         return TypeSpec.classBuilder(configSpec.getClassName().simpleName())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addAnnotation(generatedAnnotationSpec)
                 .addField(FieldSpec.builder(String.class, CONFIG_DAGGERSERVICENAME, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                         .initializer("$S", configSpec.getDaggerServiceName())
                         .build())
