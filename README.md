@@ -368,14 +368,14 @@ Finally, navigate between screens like you would normally do:
 `Flow.get(context).set(new MVP_ShowUserScreen("lukasz"))`
 
 
-### Component factory
+### Component factory and helper
 
 When using Mortar and Flow together, you would setup a context factory that setups the mortar context associated with the screen to display. You would use `DaggerService.createComponent()` to create the component associated to the screen, using reflection.  
 `@MVP` generates for you the method that create the component without reflection.
 The generated screen implements a `ComponentFactory` interface that declares the createComponent method. This method takes the parent component as parameter, and returns an instance of the component. It looks like:
 
 ```java
-public final class MVP_ViewPostScreen extends Path implements ComponentFactory<RootActivity.Component> {
+public final class MVP_ViewPostScreen implements ComponentFactory<RootActivity.Component> {
 
   @Override
   public Object createComponent(mvp.sample.ui.activity.RootActivity.Component parentComponent) {
@@ -384,6 +384,53 @@ public final class MVP_ViewPostScreen extends Path implements ComponentFactory<R
     	.module(new Module())
     	.build();
   }
+```
+
+The generated screen provides also a helper static get method that retreives the component from the context:
+
+```java
+public final class MVP_ViewPostScreen implements ComponentFactory<RootActivity.Component> {
+
+  public static Component getComponent(Context context) {
+    return (Component) context.getSystemService(MVP_Config.DAGGER_SERVICE_NAME);
+  }
+```
+
+
+### @WithInjector
+
+Allows you to declare additional injectors inside the generated component.
+
+```java
+@WithInjector(ViewPostPresenter.class)
+public class BannerView extends LinearLayout {
+
+    @Inject
+    protected ViewPostPresenter presenter;
+
+    public BannerView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+
+        MVP_ViewPostScreen.getComponent(context).inject(this);
+
+        View view = View.inflate(context, R.layout.view_banner, this);
+        ButterKnife.inject(view);
+    }
+```
+
+and the generated component will look like:
+
+```java
+public final class MVP_ViewPostScreen {
+
+	@dagger.Component
+	@ScreenScope(Component.class)
+	public interface Component {
+	  void inject(View view); // custom view associated to the presenter
+	
+	  void inject(BannerView bannerview); // the additional injector
+	}
+}
 ```
 
 
@@ -423,8 +470,8 @@ repositories {
 }
 
 dependencies {
-    apt 'com.github.lukaspili:mortar-mvp-compiler:0.2-SNAPSHOT'
-    compile 'com.github.lukaspili:mortar-mvp:0.2-SNAPSHOT'
+    apt 'com.github.lukaspili:mortar-mvp-compiler:0.3-SNAPSHOT'
+    compile 'com.github.lukaspili:mortar-mvp:0.3-SNAPSHOT'
 }
 ```
 
