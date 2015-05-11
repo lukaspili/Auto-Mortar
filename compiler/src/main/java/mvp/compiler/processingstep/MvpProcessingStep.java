@@ -14,6 +14,8 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
@@ -270,9 +272,15 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         List<WithInjectorSpec> withInjectorSpecs = new ArrayList<>();
         for (WithInjectorExtractor extractor : withInjectorExtractors) {
             for (TypeMirror typeMirror : extractor.getTypeMirrors()) {
-                if (MoreTypes.equivalence().equivalent(typeMirror, elementExtractor.getElement().asType())) {
-                    String name = extractor.getElement().getSimpleName().toString().toLowerCase();
-                    withInjectorSpecs.add(new WithInjectorSpec(name, TypeName.get(extractor.getElement().asType())));
+                // BUG: Types.isSameType does not work when Component has another generated component as parent
+                // types.isSameType(elementExtractor.getElement().asType(), typeMirror)
+                // Dirty fix: let's compare qualified name rather than typemirror
+                String first = elementExtractor.getElement().asType().toString();
+                String second = typeMirror.toString();
+
+                if (StringUtils.equals(first, second)) {
+//                    String name = extractor.getElement().getSimpleName().toString().toLowerCase();
+                    withInjectorSpecs.add(new WithInjectorSpec("view", TypeName.get(extractor.getElement().asType())));
                 }
             }
         }
