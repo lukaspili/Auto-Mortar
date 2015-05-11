@@ -14,6 +14,7 @@ public class ComponentSpec extends AbstractSpec {
     private TypeName moduleTypeName;
     private TypeName viewTypeName;
     private List<WithInjectorSpec> withInjectorSpecs;
+    private List<WithComponentSpec> withComponentSpecs;
 
     public ComponentSpec(ClassName className) {
         super(className);
@@ -49,5 +50,13 @@ public class ComponentSpec extends AbstractSpec {
 
     public void setWithInjectorSpecs(List<WithInjectorSpec> withInjectorSpecs) {
         this.withInjectorSpecs = withInjectorSpecs;
+    }
+
+    public List<WithComponentSpec> getWithComponentSpecs() {
+        return withComponentSpecs;
+    }
+
+    public void setWithComponentSpecs(List<WithComponentSpec> withComponentSpecs) {
+        this.withComponentSpecs = withComponentSpecs;
     }
 }

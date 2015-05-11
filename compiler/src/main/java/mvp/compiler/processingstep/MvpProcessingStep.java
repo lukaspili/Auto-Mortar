@@ -14,7 +14,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -37,10 +37,12 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import dagger.Component;
 import mvp.MVP;
 import mvp.ScreenParam;
 import mvp.compiler.MisunderstoodPoet;
 import mvp.compiler.extractor.ElementExtractor;
+import mvp.compiler.extractor.WithComponentExtractor;
 import mvp.compiler.extractor.WithInjectorExtractor;
 import mvp.compiler.message.Message;
 import mvp.compiler.message.MessageDelivery;
@@ -52,6 +54,7 @@ import mvp.compiler.model.spec.ConfigSpec;
 import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
+import mvp.compiler.model.spec.WithComponentSpec;
 import mvp.compiler.model.spec.WithInjectorSpec;
 import mvp.compiler.names.ClassNames;
 import mvp.compiler.names.Textes;
@@ -98,6 +101,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         }
 
         List<WithInjectorExtractor> withInjectorExtractors = processingStepsBus.getWithInjectorExtractors();
+        List<WithComponentExtractor> withComponentExtractors = processingStepsBus.getWithComponentExtractors();
 
         List<ScreenSpec> screenSpecs = new ArrayList<>();
         for (Class<? extends Annotation> annotation : elementsByAnnotation.keySet()) {
@@ -113,7 +117,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
 
                 ClassNames classNames = new ClassNames(elementExtractor.getElement());
 
-                ScreenSpec screenSpec = buildScreen(elementExtractor, classNames, configuration, withInjectorExtractors);
+                ScreenSpec screenSpec = buildScreen(elementExtractor, classNames, configuration, withInjectorExtractors, withComponentExtractors);
                 Preconditions.checkNotNull(screenSpec);
                 screenSpecs.add(screenSpec);
             }
@@ -134,12 +138,13 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         return configSpec;
     }
 
-    private ScreenSpec buildScreen(ElementExtractor elementExtractor, ClassNames classNames, Configuration configuration, List<WithInjectorExtractor> withInjectorExtractors) {
+    private ScreenSpec buildScreen(ElementExtractor elementExtractor, ClassNames classNames, Configuration configuration, List<WithInjectorExtractor> withInjectorExtractors, List<WithComponentExtractor> withComponentExtractors) {
         Preconditions.checkNotNull(elementExtractor);
         Preconditions.checkNotNull(classNames);
 
         ScreenSpec screenSpec = new ScreenSpec(classNames.getScreenClassName(), elementExtractor.getElement());
         screenSpec.setDaggerComponentTypeName(classNames.getDaggerComponentClassName());
+        screenSpec.setPresenterTypeName(classNames.getPresenterClassName());
 
         // screen superclass, first let's see if user specified a superclass on @MVP
         // otherwise use config
@@ -195,7 +200,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         Preconditions.checkNotNull(moduleSpec);
         screenSpec.setModuleSpec(moduleSpec);
 
-        ComponentSpec componentSpec = buildComponent(elementExtractor, classNames, withInjectorExtractors);
+        ComponentSpec componentSpec = buildComponent(elementExtractor, classNames, withInjectorExtractors, withComponentExtractors);
         Preconditions.checkNotNull(componentSpec);
         componentSpec.setViewTypeName(screenSpec.getViewTypeName());
         screenSpec.setComponentSpec(componentSpec);
@@ -261,30 +266,50 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         return moduleSpec;
     }
 
-    private ComponentSpec buildComponent(ElementExtractor elementExtractor, ClassNames classNames, List<WithInjectorExtractor> withInjectorExtractors) {
+    private ComponentSpec buildComponent(ElementExtractor elementExtractor, ClassNames classNames, List<WithInjectorExtractor> withInjectorExtractors, List<WithComponentExtractor> withComponentExtractors) {
         Preconditions.checkNotNull(elementExtractor);
         Preconditions.checkNotNull(classNames);
 
         ComponentSpec componentSpec = new ComponentSpec(classNames.getComponentClassName());
-        componentSpec.setParentTypeName(TypeName.get(elementExtractor.getParentComponentTypeMirror()));
         componentSpec.setModuleTypeName(classNames.getModuleClassName());
 
-        List<WithInjectorSpec> withInjectorSpecs = new ArrayList<>();
-        for (WithInjectorExtractor extractor : withInjectorExtractors) {
-            for (TypeMirror typeMirror : extractor.getTypeMirrors()) {
-                // BUG: Types.isSameType does not work when Component has another generated component as parent
-                // types.isSameType(elementExtractor.getElement().asType(), typeMirror)
-                // Dirty fix: let's compare qualified name rather than typemirror
-                String first = elementExtractor.getElement().asType().toString();
-                String second = typeMirror.toString();
+        // parent can be comp interface or presenter
+        Element e = MoreTypes.asElement(elementExtractor.getParentTypeMirror());
+        if (MoreElements.isAnnotationPresent(e, Component.class)) {
+            componentSpec.setParentTypeName(TypeName.get(elementExtractor.getParentTypeMirror()));
+        } else if (MoreElements.isAnnotationPresent(e, MVP.class)) {
+            ClassNames elementClassNames = new ClassNames(e);
+            componentSpec.setParentTypeName(elementClassNames.getComponentClassName());
+        } else {
+            throw new IllegalStateException("@MVP parent must be a dagger 2 component or an @MVP annotated presenter");
+        }
 
-                if (StringUtils.equals(first, second)) {
+        List<WithInjectorSpec> withInjectorSpecs = new ArrayList<>();
+        if (withInjectorExtractors != null) {
+            for (WithInjectorExtractor extractor : withInjectorExtractors) {
+                for (TypeMirror typeMirror : extractor.getTypeMirrors()) {
+                    if (types.isSameType(elementExtractor.getElement().asType(), typeMirror)) {
 //                    String name = extractor.getElement().getSimpleName().toString().toLowerCase();
-                    withInjectorSpecs.add(new WithInjectorSpec("view", TypeName.get(extractor.getElement().asType())));
+                        withInjectorSpecs.add(new WithInjectorSpec("view", TypeName.get(extractor.getElement().asType())));
+                    }
                 }
             }
         }
         componentSpec.setWithInjectorSpecs(withInjectorSpecs);
+
+        List<WithComponentSpec> withComponentSpecs = new ArrayList<>();
+        if (withComponentExtractors != null) {
+            for (WithComponentExtractor extractor : withComponentExtractors) {
+                for (TypeMirror typeMirror : extractor.getTypeMirrors()) {
+                    if (types.isSameType(elementExtractor.getElement().asType(), typeMirror)) {
+                        String name = extractor.getElement().getSimpleName().toString();
+                        name = WordUtils.uncapitalize(name);
+                        withComponentSpecs.add(new WithComponentSpec(name, TypeName.get(extractor.getElement().asType())));
+                    }
+                }
+            }
+        }
+        componentSpec.setWithComponentSpecs(withComponentSpecs);
 
         return componentSpec;
     }
@@ -302,7 +327,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
             return false;
         }
 
-        if (elementExtractor.getParentComponentTypeMirror() == null) {
+        if (elementExtractor.getParentTypeMirror() == null) {
             messageDelivery.add(Message.error(elementExtractor.getElement(), "@MVP requires parentComponent to be defined."));
             return false;
         }

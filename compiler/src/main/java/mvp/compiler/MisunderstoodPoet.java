@@ -30,6 +30,7 @@ import mvp.compiler.model.spec.ConfigSpec;
 import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
+import mvp.compiler.model.spec.WithComponentSpec;
 import mvp.compiler.model.spec.WithInjectorSpec;
 import mvp.compiler.names.ClassNames;
 
@@ -50,7 +51,7 @@ public class MisunderstoodPoet {
         }
 
         AnnotationSpec scopeAnnotationSpec = AnnotationSpec.builder(ScreenScope.class)
-                .addMember("value", "$T.class", screenSpec.getComponentSpec().getClassName())
+                .addMember("value", "$T.class", screenSpec.getPresenterTypeName())
                 .build();
 
         screenTypeSpecBuilder.addType(composeModule(screenSpec.getModuleSpec(), scopeAnnotationSpec));
@@ -198,6 +199,13 @@ public class MisunderstoodPoet {
             builder.addMethod(MethodSpec.methodBuilder("inject")
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                     .addParameter(withInjectorSpec.getTypeName(), withInjectorSpec.getName())
+                    .build());
+        }
+
+        for (WithComponentSpec withComponentSpec : componentSpec.getWithComponentSpecs()) {
+            builder.addMethod(MethodSpec.methodBuilder(withComponentSpec.getName())
+                    .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                    .returns(withComponentSpec.getTypeName())
                     .build());
         }
 

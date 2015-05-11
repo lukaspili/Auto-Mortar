@@ -19,7 +19,7 @@ public class ShowUserScreen extends Path {
     }
 
     @dagger.Component(dependencies = RootActivity.Component.class, modules = Module.class)
-    @PerScreenScope(Component.class)
+    @PerScreenScope(ShowUserPresenter.class)
     public interface Component extends RootActivity.Component {
         void inject(ShowUserView view);
     }
@@ -28,13 +28,13 @@ public class ShowUserScreen extends Path {
     public class Module {
 
         @Provides
-        @PerScreenScope(Component.class)
+        @PerScreenScope(ShowUserPresenter.class)
         public Presenter providePresenter(RestClient restClient) {
             return new Presenter(username, restClient);
         }
     }
 
-    @PerScreenScope(Component.class)
+    @PerScreenScope(ShowUserPresenter.class)
     public static class Presenter extends ViewPresenter<ShowUserView> {
 
         private final String username;
@@ -87,7 +87,7 @@ public class ShowUserView extends LinearLayout {
 // ShowUserPresenter.java
 
 @MVP(
-        parentComponent = RootActivity.Component.class,
+        parent = RootActivity.Component.class,
         baseViewLayout = LinearLayout.class,
         screenAnnotations = Layout.class
 )
@@ -177,11 +177,11 @@ For navigation parameters between screens, see below.
 
 The generated component is named MVP_YourNameScreen.Component. It declares that the associated view of the presenter can be injected.
 
-In the `@MVP` annotation, you must declare the parent component that defines the generated component dependency.
+In the `@MVP` annotation, you must declare the parent that defines the generated component dependency. It can be a parent component or a parent presenter annotated with @MVP.
 
 ```java
 @MVP(
-	parentComponent = RootActivity.Component.class,
+	parent = RootActivity.Component.class, // RootActivity.Component is a dagger 2 annotated @Component
 )
 ```
 
@@ -192,7 +192,7 @@ And the generated component looks like:
     dependencies = mvp.sample.ui.activity.RootActivity.Component.class,
     modules = Module.class
 )
-@ScreenScope(Component.class)
+@ScreenScope(YourPresenter.class)
 public interface Component extends mvp.sample.ui.activity.RootActivity.Component {
     void inject(View view);
 }
@@ -209,7 +209,7 @@ Generated module looks like:
 @dagger.Module
   public class Module {
     @Provides
-    @ScreenScope(Component.class)
+    @ScreenScope(YourNamePresenter.class)
     public YourNamePresenter providePresenter(RestClient restClient) {
       return new YourNamePresenter(restClient);
     }
@@ -354,7 +354,7 @@ public final class MVP_ShowUserScreen {
   @dagger.Module
   public class Module {
     @Provides
-    @ScreenScope(Component.class)
+    @ScreenScope(ViewPostPresenter.class)
     public ShowUserPresenter providePresenter(RestClient restClient) {
       return new ViewPostPresenter(username, restClient);
     }
@@ -402,7 +402,7 @@ public final class MVP_ViewPostScreen implements ComponentFactory<RootActivity.C
 Allows you to declare additional injectors inside the generated component.
 
 ```java
-@WithInjector(ViewPostPresenter.class)
+@WithInjector(ViewPostPresenter.class) // the presenter from witch the component will be generated
 public class BannerView extends LinearLayout {
 
     @Inject
@@ -416,6 +416,7 @@ public class BannerView extends LinearLayout {
         View view = View.inflate(context, R.layout.view_banner, this);
         ButterKnife.inject(view);
     }
+}
 ```
 
 and the generated component will look like:
@@ -424,7 +425,7 @@ and the generated component will look like:
 public final class MVP_ViewPostScreen {
 
 	@dagger.Component
-	@ScreenScope(Component.class)
+	@ScreenScope(ViewPostPresenter.class)
 	public interface Component {
 	  void inject(View view); // custom view associated to the presenter
 	
@@ -434,16 +435,43 @@ public final class MVP_ViewPostScreen {
 ```
 
 
+### @WithComponent
+
+Allows you to declare additional exposed dependencies inside the generated component.
+
+```java
+@WithComponent(ViewPostPresenter.class) // the presenter from witch the component will be generated
+@ScreenScope(ViewPostPresenter.class) // usually you would configure the same dagger scope
+public class SomeObject {
+
+}
+```
+
+and the generated component will look like:
+
+```java
+public final class MVP_ViewPostScreen {
+
+	@dagger.Component
+	@ScreenScope(ViewPostPresenter.class)
+	public interface Component {
+	  void inject(View view); // custom view associated to the presenter
+	
+	  SomeObject someObject(); // the additional exposed dependency
+	}
+}
+```
+
+
 ### Dagger scope
 
-Each generated screen, and its associated component and presenter will be scoped using the `@ScreenScope(Component.class)` (where Component is the generated component).  
-ScreenScope is a dagger scope annotation provided by Mortar MVP.
+Each generated screen, and its associated component and presenter will be scoped using the `@ScreenScope(YourPresenter.class)`. ScreenScope is a dagger scope annotation provided by Mortar MVP.
 
 
-### DaggerService
 
-Since Mortar 0.17, the dagger2support was removed.  
-Mortar MVP provides a `DaggerService` class that works pretty much the same like the old one.
+## Limitation
+
+- Do not declare any generated class in @MVP, @ScreenScope, @WithComponent and @WithInjector.
 
 
 ## Installation
@@ -470,8 +498,8 @@ repositories {
 }
 
 dependencies {
-    apt 'com.github.lukaspili:mortar-mvp-compiler:0.3-SNAPSHOT'
-    compile 'com.github.lukaspili:mortar-mvp:0.3-SNAPSHOT'
+    apt 'com.github.lukaspili:mortar-mvp-compiler:0.4-SNAPSHOT'
+    compile 'com.github.lukaspili:mortar-mvp:0.4-SNAPSHOT'
 }
 ```
 

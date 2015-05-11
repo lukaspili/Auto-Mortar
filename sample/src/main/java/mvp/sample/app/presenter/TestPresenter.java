@@ -12,7 +12,7 @@ import mvp.sample.ui.view.TestView;
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
 @MVP(
-        parentComponent = MVP_PostsScreen.Component.class,
+        parent = PostsPresenter.class,
         baseViewLayout = LinearLayout.class
 )
 public class TestPresenter extends ViewPresenter<TestView> {

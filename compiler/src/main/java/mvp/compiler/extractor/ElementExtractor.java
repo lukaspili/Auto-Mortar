@@ -25,14 +25,14 @@ public class ElementExtractor {
 
     private static final String MVP_VIEW_BASE_LAYOUT = "baseViewLayout";
     private static final String MVP_VIEW = "view";
-    private static final String MVP_PARENT_COMPONENT = "parentComponent";
+    private static final String MVP_PARENT = "parent";
     private static final String MVP_SCREEN_SUPERCLASS = "screenSuperclass";
     private static final String MVP_SCREEN_ANNOTATIONS = "screenAnnotations";
 
     private final Element element;
     private final TypeMirror viewTypeMirror;
     private final TypeMirror viewBaseLayoutTypeMirror;
-    private final TypeMirror parentComponentTypeMirror;
+    private final TypeMirror parentTypeMirror;
     private final TypeMirror elementParameterizedType;
     private final TypeMirror screenSuperclassTypeMirror;
     private final List<AnnotationMirror> screenAnnotationsMirrors;
@@ -42,7 +42,7 @@ public class ElementExtractor {
 
         viewTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_VIEW);
         viewBaseLayoutTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_VIEW_BASE_LAYOUT);
-        parentComponentTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_PARENT_COMPONENT);
+        parentTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_PARENT);
         elementParameterizedType = extractParameterizedType(types, elements);
         screenSuperclassTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_SCREEN_SUPERCLASS);
 
@@ -101,8 +101,8 @@ public class ElementExtractor {
         return viewBaseLayoutTypeMirror;
     }
 
-    public TypeMirror getParentComponentTypeMirror() {
-        return parentComponentTypeMirror;
+    public TypeMirror getParentTypeMirror() {
+        return parentTypeMirror;
     }
 
     public TypeMirror getElementParameterizedType() {

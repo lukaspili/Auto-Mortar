@@ -22,6 +22,7 @@ public class ScreenSpec extends AbstractSpec {
     private ModuleSpec moduleSpec;
     private ComponentSpec componentSpec;
     private ClassName daggerComponentTypeName;
+    private TypeName presenterTypeName;
     private List<InjectableVariableElement> screenParamMembers;
     private List<ScreenAnnotationSpec> annotationSpecs;
 
@@ -84,6 +85,14 @@ public class ScreenSpec extends AbstractSpec {
 
     public void setDaggerComponentTypeName(ClassName daggerComponentTypeName) {
         this.daggerComponentTypeName = daggerComponentTypeName;
+    }
+
+    public TypeName getPresenterTypeName() {
+        return presenterTypeName;
+    }
+
+    public void setPresenterTypeName(TypeName presenterTypeName) {
+        this.presenterTypeName = presenterTypeName;
     }
 
     public List<InjectableVariableElement> getScreenParamMembers() {

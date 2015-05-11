@@ -19,7 +19,7 @@ import timber.log.Timber;
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
 @MVP(
-        parentComponent = RootActivity.Component.class,
+        parent = RootActivity.Component.class,
         baseViewLayout = LinearLayout.class,
         screenAnnotations = Layout.class
 )
