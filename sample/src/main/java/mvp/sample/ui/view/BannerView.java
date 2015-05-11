@@ -35,7 +35,6 @@ public class BannerView extends LinearLayout {
 
     @OnClick(R.id.text)
     void click() {
-        Timber.d("CLICK");
         presenter.bannerClick();
     }
 }

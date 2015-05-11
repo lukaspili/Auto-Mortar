@@ -1,4 +1,4 @@
-package mvp;
+package mvp.sample.app;
 
 import android.content.Context;
 

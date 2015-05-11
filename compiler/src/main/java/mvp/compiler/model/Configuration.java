@@ -2,8 +2,8 @@ package mvp.compiler.model;
 
 import com.squareup.javapoet.TypeName;
 
-import mvp.DaggerService;
 import mvp.compiler.extractor.ConfigurationExtractor;
+import mvp.config.DefaultMvpConfiguration;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
@@ -25,7 +25,7 @@ public class Configuration {
     private Configuration() {
         butterknife = false;
         screenSuperclassTypeName = null;
-        daggerServiceName = DaggerService.SERVICE_NAME;
+        daggerServiceName = DefaultMvpConfiguration.DAGGER_SERVICE_NAME;
     }
 
     private Configuration(ConfigurationExtractor configurationExtractor) {

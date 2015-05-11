@@ -27,10 +27,10 @@ import mvp.compiler.model.InjectableVariableElement;
 import mvp.compiler.model.spec.BaseViewSpec;
 import mvp.compiler.model.spec.ComponentSpec;
 import mvp.compiler.model.spec.ConfigSpec;
-import mvp.compiler.model.spec.WithInjectorSpec;
 import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
+import mvp.compiler.model.spec.WithInjectorSpec;
 import mvp.compiler.names.ClassNames;
 
 /**
@@ -214,7 +214,7 @@ public class MisunderstoodPoet {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(ClassNames.context(), "context")
                 .returns(screenSpec.getComponentSpec().getClassName())
-                .addStatement("return $T.<$T>getDaggerComponent($L)", ClassNames.daggerService(), screenSpec.getComponentSpec().getClassName(), "context")
+                .addStatement("return ($T) $L.getSystemService($T.$L)", screenSpec.getComponentSpec().getClassName(), "context", ClassNames.mvpConfig(), CONFIG_DAGGERSERVICENAME)
                 .build();
 
         MethodSpec createComponentMethod = MethodSpec.methodBuilder("createComponent")
@@ -271,8 +271,13 @@ public class MisunderstoodPoet {
     }
 
     public TypeSpec compose(ConfigSpec configSpec) {
+        AnnotationSpec generatedAnnotationSpec = AnnotationSpec.builder(Generated.class)
+                .addMember("value", "$S", AnnotationProcessor.class.getName())
+                .build();
+
         return TypeSpec.classBuilder(configSpec.getClassName().simpleName())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addAnnotation(generatedAnnotationSpec)
                 .addField(FieldSpec.builder(String.class, CONFIG_DAGGERSERVICENAME, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
                         .initializer("$S", configSpec.getDaggerServiceName())
                         .build())

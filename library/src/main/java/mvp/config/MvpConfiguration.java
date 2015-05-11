@@ -5,8 +5,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import mvp.DaggerService;
-
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
@@ -18,6 +16,6 @@ public @interface MvpConfiguration {
 
     Class<?> screenSuperclass() default void.class;
 
-    String daggerServiceName() default DaggerService.SERVICE_NAME;
+    String daggerServiceName() default DefaultMvpConfiguration.DAGGER_SERVICE_NAME;
 
 }

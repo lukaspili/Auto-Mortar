@@ -6,7 +6,7 @@ import flownavigation.common.mortar.BasicScreenScoper;
 import flownavigation.path.Path;
 import mortar.MortarScope;
 import mvp.ComponentFactory;
-import mvp.DaggerService;
+import mvp.sample.app.DaggerService;
 
 /**
  * @author Lukasz Piliszczuk - lukasz.pili@gmail.com

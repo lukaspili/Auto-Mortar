@@ -2,14 +2,14 @@ package mvp.config;
 
 import java.lang.annotation.Annotation;
 
-import mvp.DaggerService;
-
 /**
  * Default configuration applied in none is provided
  *
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
 public class DefaultMvpConfiguration implements MvpConfiguration {
+
+    public static final String DAGGER_SERVICE_NAME = "mvp.DaggerService";
 
     @Override
     public boolean butterknife() {
@@ -23,7 +23,7 @@ public class DefaultMvpConfiguration implements MvpConfiguration {
 
     @Override
     public String daggerServiceName() {
-        return DaggerService.SERVICE_NAME;
+        return DAGGER_SERVICE_NAME;
     }
 
     @Override

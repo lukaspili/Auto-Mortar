@@ -40,6 +40,6 @@ public class ViewPostPresenter extends ViewPresenter<ViewPostView> {
     }
 
     public void bannerClick() {
-        Timber.d("banner click !");
+        Timber.d("Banner click !");
     }
 }
