@@ -13,7 +13,7 @@ public class ComponentSpec extends AbstractSpec {
     private TypeName parentTypeName;
     private TypeName moduleTypeName;
     private TypeName viewTypeName;
-    private List<InjectableWithSpec> additionalInjects;
+    private List<WithInjectorSpec> withInjectorSpecs;
 
     public ComponentSpec(ClassName className) {
         super(className);
@@ -43,11 +43,11 @@ public class ComponentSpec extends AbstractSpec {
         this.viewTypeName = viewTypeName;
     }
 
-    public List<InjectableWithSpec> getAdditionalInjects() {
-        return additionalInjects;
+    public List<WithInjectorSpec> getWithInjectorSpecs() {
+        return withInjectorSpecs;
     }
 
-    public void setAdditionalInjects(List<InjectableWithSpec> additionalInjects) {
-        this.additionalInjects = additionalInjects;
+    public void setWithInjectorSpecs(List<WithInjectorSpec> withInjectorSpecs) {
+        this.withInjectorSpecs = withInjectorSpecs;
     }
 }

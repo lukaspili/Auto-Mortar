@@ -27,7 +27,7 @@ import mvp.compiler.model.InjectableVariableElement;
 import mvp.compiler.model.spec.BaseViewSpec;
 import mvp.compiler.model.spec.ComponentSpec;
 import mvp.compiler.model.spec.ConfigSpec;
-import mvp.compiler.model.spec.InjectableWithSpec;
+import mvp.compiler.model.spec.WithInjectorSpec;
 import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
@@ -194,12 +194,10 @@ public class MisunderstoodPoet {
                         .addParameter(componentSpec.getViewTypeName(), "view")
                         .build());
 
-        System.out.println("WORKS SO FAR");
-
-        for (InjectableWithSpec injectableWithSpec : componentSpec.getAdditionalInjects()) {
+        for (WithInjectorSpec withInjectorSpec : componentSpec.getWithInjectorSpecs()) {
             builder.addMethod(MethodSpec.methodBuilder("inject")
                     .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                    .addParameter(injectableWithSpec.getTypeName(), injectableWithSpec.getName())
+                    .addParameter(withInjectorSpec.getTypeName(), withInjectorSpec.getName())
                     .build());
         }
 
@@ -209,6 +207,14 @@ public class MisunderstoodPoet {
     private TypeSpec.Builder createScreenBuilder(ScreenSpec screenSpec) {
         AnnotationSpec generatedAnnotationSpec = AnnotationSpec.builder(Generated.class)
                 .addMember("value", "$S", AnnotationProcessor.class.getName())
+                .build();
+
+        // static getComponent(Context)
+        MethodSpec getComponentMethod = MethodSpec.methodBuilder("getComponent")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(ClassNames.context(), "context")
+                .returns(screenSpec.getComponentSpec().getClassName())
+                .addStatement("return $T.<$T>getDaggerComponent($L)", ClassNames.daggerService(), screenSpec.getComponentSpec().getClassName(), "context")
                 .build();
 
         MethodSpec createComponentMethod = MethodSpec.methodBuilder("createComponent")
@@ -226,7 +232,8 @@ public class MisunderstoodPoet {
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addSuperinterface(ParameterizedTypeName.get(ClassName.get(ComponentFactory.class), screenSpec.getComponentSpec().getParentTypeName()))
                 .addAnnotation(generatedAnnotationSpec)
-                .addMethod(createComponentMethod);
+                .addMethod(createComponentMethod)
+                .addMethod(getComponentMethod);
 
         if (screenSpec.getSuperclassTypeName() != null) {
             builder.superclass(screenSpec.getSuperclassTypeName());

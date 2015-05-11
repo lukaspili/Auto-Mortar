@@ -7,21 +7,21 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
 
-import mvp.InjectableWith;
+import mvp.WithInjector;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
-public class InjectableWithExtractor {
+public class WithInjectorExtractor {
 
     private final Element element;
     private final List<TypeMirror> typeMirrors;
 
-    public InjectableWithExtractor(Element element) {
+    public WithInjectorExtractor(Element element) {
         this.element = element;
 
         typeMirrors = new ArrayList<>();
-        List<AnnotationValue> values = Utils.getValueFromAnnotation(element, InjectableWith.class, "value");
+        List<AnnotationValue> values = Utils.getValueFromAnnotation(element, WithInjector.class, "value");
         if (values != null) {
             for (AnnotationValue value : values) {
                 TypeMirror tm = (TypeMirror) value.getValue();

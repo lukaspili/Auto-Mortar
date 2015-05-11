@@ -2,9 +2,8 @@ package mvp.compiler.processingstep;
 
 import java.util.List;
 
-import mvp.compiler.extractor.InjectableWithExtractor;
+import mvp.compiler.extractor.WithInjectorExtractor;
 import mvp.compiler.model.Configuration;
-import mvp.compiler.model.spec.InjectableWithSpec;
 
 /**
  * Pass data between processing steps
@@ -13,18 +12,16 @@ import mvp.compiler.model.spec.InjectableWithSpec;
  */
 public class ProcessingStepsBus {
 
-    private List<InjectableWithSpec> injectableWithSpecs;
-    private List<InjectableWithExtractor> injectableWithExtractors;
-
+    private List<WithInjectorExtractor> withInjectorExtractors;
     private Configuration configuration;
     private boolean configGenerated;
 
-    public List<InjectableWithExtractor> getInjectableWithExtractors() {
-        return injectableWithExtractors;
+    public List<WithInjectorExtractor> getWithInjectorExtractors() {
+        return withInjectorExtractors;
     }
 
-    public void setInjectableWithExtractors(List<InjectableWithExtractor> injectableWithExtractors) {
-        this.injectableWithExtractors = injectableWithExtractors;
+    public void setWithInjectorExtractors(List<WithInjectorExtractor> withInjectorExtractors) {
+        this.withInjectorExtractors = withInjectorExtractors;
     }
 
     public Configuration getConfiguration() {

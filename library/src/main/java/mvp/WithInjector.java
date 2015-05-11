@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
-public @interface InjectableWith {
+public @interface WithInjector {
 
     Class<?>[] value() default {};
 }
