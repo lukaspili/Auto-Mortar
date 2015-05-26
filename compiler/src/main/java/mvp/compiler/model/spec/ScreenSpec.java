@@ -17,10 +17,7 @@ public class ScreenSpec extends AbstractSpec {
     private final Element element;
     private TypeName superclassTypeName;
     private ClassName layoutAnnotationClassName;
-    private BaseViewSpec baseViewSpec;
-    private TypeName viewTypeName;
     private ModuleSpec moduleSpec;
-    private ComponentSpec componentSpec;
     private ClassName daggerComponentTypeName;
     private TypeName presenterTypeName;
     private List<InjectableVariableElement> screenParamMembers;
@@ -47,36 +44,12 @@ public class ScreenSpec extends AbstractSpec {
         this.layoutAnnotationClassName = layoutAnnotationClassName;
     }
 
-    public BaseViewSpec getBaseViewSpec() {
-        return baseViewSpec;
-    }
-
-    public void setBaseViewSpec(BaseViewSpec baseViewSpec) {
-        this.baseViewSpec = baseViewSpec;
-    }
-
-    public TypeName getViewTypeName() {
-        return viewTypeName;
-    }
-
-    public void setViewTypeName(TypeName viewTypeName) {
-        this.viewTypeName = viewTypeName;
-    }
-
     public ModuleSpec getModuleSpec() {
         return moduleSpec;
     }
 
     public void setModuleSpec(ModuleSpec moduleSpec) {
         this.moduleSpec = moduleSpec;
-    }
-
-    public ComponentSpec getComponentSpec() {
-        return componentSpec;
-    }
-
-    public void setComponentSpec(ComponentSpec componentSpec) {
-        this.componentSpec = componentSpec;
     }
 
     public ClassName getDaggerComponentTypeName() {

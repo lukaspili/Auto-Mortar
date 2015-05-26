@@ -23,15 +23,11 @@ import javax.lang.model.util.Types;
  */
 public class ElementExtractor {
 
-    private static final String MVP_VIEW_BASE_LAYOUT = "baseViewLayout";
-    private static final String MVP_VIEW = "view";
     private static final String MVP_PARENT = "parent";
     private static final String MVP_SCREEN_SUPERCLASS = "screenSuperclass";
     private static final String MVP_SCREEN_ANNOTATIONS = "screenAnnotations";
 
     private final Element element;
-    private final TypeMirror viewTypeMirror;
-    private final TypeMirror viewBaseLayoutTypeMirror;
     private final TypeMirror parentTypeMirror;
     private final TypeMirror elementParameterizedType;
     private final TypeMirror screenSuperclassTypeMirror;
@@ -40,8 +36,6 @@ public class ElementExtractor {
     public ElementExtractor(Element element, Class<? extends Annotation> annotation, Types types, Elements elements) {
         this.element = element;
 
-        viewTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_VIEW);
-        viewBaseLayoutTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_VIEW_BASE_LAYOUT);
         parentTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_PARENT);
         elementParameterizedType = extractParameterizedType(types, elements);
         screenSuperclassTypeMirror = Utils.getValueFromAnnotation(element, annotation, MVP_SCREEN_SUPERCLASS);
@@ -91,14 +85,6 @@ public class ElementExtractor {
 
     public Element getElement() {
         return element;
-    }
-
-    public TypeMirror getViewTypeMirror() {
-        return viewTypeMirror;
-    }
-
-    public TypeMirror getViewBaseLayoutTypeMirror() {
-        return viewBaseLayoutTypeMirror;
     }
 
     public TypeMirror getParentTypeMirror() {

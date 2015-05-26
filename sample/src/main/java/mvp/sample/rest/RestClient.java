@@ -4,15 +4,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
+import autodagger.autodagger.AutoExpose;
+import mvp.sample.app.App;
+import mvp.sample.app.DaggerScope;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 
 /**
  * Created by lukasz on 19/02/15.
  */
-@Singleton
+@DaggerScope(App.class)
+@AutoExpose(App.class)
 public class RestClient {
 
     private Service service;

@@ -15,9 +15,5 @@ public @interface MVP {
 
     Class<?> parent();
 
-    Class<?> view() default void.class;
-
-    Class<?> baseViewLayout() default void.class;
-
     Class<? extends Annotation>[] screenAnnotations() default {};
 }

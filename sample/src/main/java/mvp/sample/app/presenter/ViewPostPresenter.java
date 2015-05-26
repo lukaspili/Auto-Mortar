@@ -1,7 +1,6 @@
 package mvp.sample.app.presenter;
 
 import android.os.Bundle;
-import android.widget.LinearLayout;
 
 import javax.inject.Inject;
 
@@ -19,8 +18,7 @@ import timber.log.Timber;
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
 @MVP(
-        parent = RootActivity.Component.class,
-        baseViewLayout = LinearLayout.class,
+        parent = RootActivity.class,
         screenAnnotations = Layout.class
 )
 @Layout(R.layout.screen_view_post)

@@ -2,7 +2,6 @@ package mvp.sample.app.presenter;
 
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +27,7 @@ import timber.log.Timber;
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
 @MVP(
-        parent = RootActivity.Component.class,
-        baseViewLayout = FrameLayout.class,
+        parent = RootActivity.class,
         screenAnnotations = Layout.class
 )
 @Layout(R.layout.screen_posts)

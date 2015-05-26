@@ -7,6 +7,8 @@ import android.view.MenuItem;
 
 import com.google.gson.Gson;
 
+import autodagger.autodagger.AutoComponent;
+import autodagger.autodagger.AutoInjector;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import flow.Flow;
@@ -19,14 +21,18 @@ import flownavigation.path.PathContainerView;
 import mortar.MortarScope;
 import mortar.bundler.BundleServiceRunner;
 import mvp.sample.R;
-import mvp.sample.app.ActivityScope;
 import mvp.sample.app.App;
+import mvp.sample.app.App_Component;
+import mvp.sample.app.DaggerScope;
 import mvp.sample.app.DaggerService;
 import mvp.sample.app.presenter.MVP_PostsScreen;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
+@AutoComponent(dependencies = App.class)
+@AutoInjector
+@DaggerScope(RootActivity.class)
 public class RootActivity extends Activity implements Flow.Dispatcher {
 
     MortarScope mortarScope;
@@ -58,8 +64,8 @@ public class RootActivity extends Activity implements Flow.Dispatcher {
         mortarScope = MortarScope.findChild(getApplicationContext(), getClass().getName());
 
         if (mortarScope == null) {
-            Component component = DaggerRootActivity_Component.builder()
-                    .component(DaggerService.<App.Component>getDaggerComponent(getApplicationContext()))
+            RootActivity_Component component = DaggerRootActivity_Component.builder()
+                    .app_Component(DaggerService.<App_Component>getDaggerComponent(getApplicationContext()))
                     .build();
 
             mortarScope = MortarScope.buildChild(getApplicationContext())
@@ -68,7 +74,7 @@ public class RootActivity extends Activity implements Flow.Dispatcher {
                     .build(getClass().getName());
         }
 
-        DaggerService.<Component>getDaggerComponent(this).inject(this);
+        DaggerService.<RootActivity_Component>getDaggerComponent(this).inject(this);
 
         BundleServiceRunner.getBundleServiceRunner(this).onCreate(savedInstanceState);
 
@@ -154,12 +160,5 @@ public class RootActivity extends Activity implements Flow.Dispatcher {
                 callback.onTraversalCompleted();
             }
         });
-    }
-
-    @dagger.Component(dependencies = App.Component.class)
-    @ActivityScope
-    public interface Component extends App.Component {
-
-        void inject(RootActivity activity);
     }
 }

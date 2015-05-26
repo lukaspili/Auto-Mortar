@@ -3,6 +3,10 @@ apply plugin: 'java'
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 dependencies {
     compile project(':library')
 
@@ -19,6 +23,8 @@ dependencies {
     compile deps.flow_navigation
 
     compile deps.mortar
+
+    compile group: 'com.github.lukaspili', name: 'autodagger', version: '0.1-SNAPSHOT', changing: true
 }
 
 apply from: '../mvn-publish.gradle'
