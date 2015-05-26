@@ -11,6 +11,9 @@ import autodagger.autodagger.AutoInjector;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import mvp.sample.R;
+import mvp.sample.app.DaggerService;
+import mvp.sample.app.presenter.MVP_PostsScreen;
+import mvp.sample.app.presenter.MVP_PostsScreen_Component;
 import mvp.sample.app.presenter.PostsPresenter;
 
 /**
@@ -27,6 +30,7 @@ public class PostsView extends FrameLayout {
 
     public PostsView(Context context, AttributeSet attrs) {
         super(context, attrs);
+//        DaggerService.<MVP_PostsScreen_Component>getDaggerComponent(context).inject(this);
     }
 
     @Override

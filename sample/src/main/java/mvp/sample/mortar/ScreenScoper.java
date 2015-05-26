@@ -5,7 +5,7 @@ import android.content.Context;
 import flownavigation.common.mortar.BasicScreenScoper;
 import flownavigation.path.Path;
 import mortar.MortarScope;
-import mvp.ComponentFactory;
+import mvp.ScreenComponentFactory;
 import mvp.sample.app.DaggerService;
 
 /**
@@ -15,12 +15,12 @@ public class ScreenScoper extends BasicScreenScoper {
 
     @Override
     protected void configureMortarScope(Context context, String name, Path path, MortarScope parentScope, MortarScope.Builder mortarScopeBuilder) {
-        if (!(path instanceof ComponentFactory)) {
+        if (!(path instanceof ScreenComponentFactory)) {
             throw new IllegalStateException("Path must imlement ComponentFactory");
         }
 
-        ComponentFactory componentFactory = (ComponentFactory) path;
-        Object component = componentFactory.createComponent(parentScope.getService(DaggerService.SERVICE_NAME));
+        ScreenComponentFactory screenComponentFactory = (ScreenComponentFactory) path;
+        Object component = screenComponentFactory.createComponent(parentScope.getService(DaggerService.SERVICE_NAME));
         mortarScopeBuilder.withService(DaggerService.SERVICE_NAME, component);
     }
 }

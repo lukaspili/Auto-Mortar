@@ -14,6 +14,8 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
@@ -23,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.Filer;
-import javax.inject.Inject;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
@@ -35,6 +36,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import dagger.Component;
 import mvp.AutoScreen;
 import mvp.ScreenParam;
 import mvp.compiler.MisunderstoodPoet;
@@ -43,6 +45,7 @@ import mvp.compiler.message.Message;
 import mvp.compiler.message.MessageDelivery;
 import mvp.compiler.model.Configuration;
 import mvp.compiler.model.InjectableVariableElement;
+import mvp.compiler.model.spec.AutoComponentMemberSpec;
 import mvp.compiler.model.spec.ConfigSpec;
 import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
@@ -137,13 +140,16 @@ public class ScreenProcessingStep implements BasicAnnotationProcessor.Processing
         // dagger scope
         screenSpec.setScopeAnnotationMirror(screenExtractor.getScopeAnnotationTypeMirror());
 
+        // component name
+        screenSpec.setComponentClassName(classNames.getComponentClassName());
+
         // component dependencies
-        screenSpec.setComponentDependenciesTypeNames(buildComponentTypeNames(screenExtractor.getComponentDependencies()));
+        screenSpec.setComponentDependenciesSpecs(buildComponentTypeNames(classNames, screenExtractor.getComponentDependencies(), true));
 
         // component modules, + add the screen module
-        List<TypeName> modulesTypeNames = buildComponentTypeNames(screenExtractor.getComponentModules());
-        modulesTypeNames.add(classNames.getModuleClassName());
-        screenSpec.setComponentModulesTypeNames(modulesTypeNames);
+        List<AutoComponentMemberSpec> modulesMemberSpecs = buildComponentTypeNames(classNames, screenExtractor.getComponentModules(), false);
+        modulesMemberSpecs.add(new AutoComponentMemberSpec(classNames.getModuleClassName(), classNames.getModuleClassName(), StringUtils.uncapitalize(classNames.getModuleClassName().simpleName())));
+        screenSpec.setComponentModulesSpecs(modulesMemberSpecs);
 
         // screen annotations
         List<ScreenAnnotationSpec> annotationSpecs = buildScreenAnnotationSpecs(screenExtractor);
@@ -169,17 +175,47 @@ public class ScreenProcessingStep implements BasicAnnotationProcessor.Processing
         return screenSpec;
     }
 
-    private List<TypeName> buildComponentTypeNames(List<TypeMirror> typeMirrors) {
-        List<TypeName> typeNames = new ArrayList<>();
+    /**
+     * dependencies true for if dependencies, otherwise false for modules
+     */
+    private List<AutoComponentMemberSpec> buildComponentTypeNames(ClassNames classNames, List<TypeMirror> typeMirrors, boolean dependencies) {
+        List<AutoComponentMemberSpec> memberSpecs = new ArrayList<>();
         if (typeMirrors == null) {
-            return typeNames;
+            return memberSpecs;
         }
 
         for (TypeMirror typeMirror : typeMirrors) {
-            typeNames.add(TypeName.get(typeMirror));
+            String name;
+            TypeName typeName = TypeName.get(typeMirror);
+            TypeName realTypeName;
+            Element element = MoreTypes.asElement(typeMirror);
+
+            if (dependencies) {
+                // dependencies means type mirror is a component OR a class annotated with @AutoComponent / @AutoScreen
+                if (MoreElements.isAnnotationPresent(element, Component.class)) {
+                    // manual component, keep the name
+                    name = StringUtils.uncapitalize(element.getSimpleName().toString());
+                    realTypeName = typeName;
+                } else {
+                    // generated component, add _Component at the end
+                    name = StringUtils.uncapitalize(String.format("%s_Component", element.getSimpleName().toString()));
+                    realTypeName = ClassName.get(MoreElements.getPackage(element).toString(), String.format("%s_Component", element.getSimpleName().toString()));
+                }
+            } else {
+                // module
+                name = StringUtils.uncapitalize(element.getSimpleName().toString());
+                realTypeName = typeName;
+            }
+
+            System.out.println("E " + element.getSimpleName());
+            System.out.println("N " + name);
+            System.out.println("T " + realTypeName);
+
+
+            memberSpecs.add(new AutoComponentMemberSpec(typeName, realTypeName, name));
         }
 
-        return typeNames;
+        return memberSpecs;
     }
 
     private List<ScreenAnnotationSpec> buildScreenAnnotationSpecs(ScreenExtractor screenExtractor) {

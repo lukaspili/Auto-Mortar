@@ -1,6 +1,7 @@
 package mvp.compiler;
 
 import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
@@ -17,11 +18,14 @@ import javax.lang.model.element.VariableElement;
 import autodagger.autodagger.AutoComponent;
 import dagger.Module;
 import dagger.Provides;
+import mvp.ScreenComponentFactory;
 import mvp.compiler.model.InjectableVariableElement;
+import mvp.compiler.model.spec.AutoComponentMemberSpec;
 import mvp.compiler.model.spec.ConfigSpec;
 import mvp.compiler.model.spec.ModuleSpec;
 import mvp.compiler.model.spec.ScreenAnnotationSpec;
 import mvp.compiler.model.spec.ScreenSpec;
+import mvp.compiler.names.ClassNames;
 
 /**
  * Actually it generates readable and understandable code!
@@ -33,9 +37,13 @@ public class MisunderstoodPoet {
     private final static String CONFIG_DAGGERSERVICENAME = "DAGGER_SERVICE_NAME";
 
     public TypeSpec compose(ScreenSpec screenSpec) {
+        System.out.println("YO COMPOSE");
         TypeSpec.Builder screenTypeSpecBuilder = createScreenBuilder(screenSpec);
-
+        System.out.println("SCREEN DONE");
         screenTypeSpecBuilder.addType(composeModule(screenSpec.getModuleSpec()));
+        System.out.println("MODULE DONE");
+
+        System.out.println("DONE COMPOSE");
 
         // and compose!
         return screenTypeSpecBuilder.build();
@@ -82,32 +90,25 @@ public class MisunderstoodPoet {
         AnnotationSpec autoComponentAnnotationSpec = buildAutoComponentAnnotationSpec(screenSpec);
 
         // static getComponent(Context)
-//        MethodSpec getComponentMethod = MethodSpec.methodBuilder("getComponent")
-//                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-//                .addParameter(ClassNames.context(), "context")
-//                .returns(screenSpec.getComponentSpec().getClassName())
-//                .addStatement("return ($T) $L.getSystemService($T.$L)", screenSpec.getComponentSpec().getClassName(), "context", ClassNames.mvpConfig(), CONFIG_DAGGERSERVICENAME)
-//                .build();
-//
-//        MethodSpec createComponentMethod = MethodSpec.methodBuilder("createComponent")
-//                .addModifiers(Modifier.PUBLIC)
-//                .returns(Object.class)
-//                .addParameter(screenSpec.getComponentSpec().getParentTypeName(), "parentComponent")
-//                .addAnnotation(Override.class)
-//                .addCode("return $T.builder()\n\t" +
-//                        ".component(parentComponent)\n\t" +
-//                        ".module(new Module())\n\t" +
-//                        ".build();\n", screenSpec.getDaggerComponentTypeName())
-//                .build();
+        MethodSpec getComponentMethod = MethodSpec.methodBuilder("getComponent")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(ClassNames.context(), "context")
+                .returns(screenSpec.getComponentClassName())
+                .addStatement("return ($T) $L.getSystemService($T.$L)", screenSpec.getComponentClassName(), "context", ClassNames.mvpConfig(), CONFIG_DAGGERSERVICENAME)
+                .build();
+
+        System.out.println("YO 1");
+
+        // createComponent()
+        MethodSpec createComponentMethod = buildScreenCreateComponentMethodSpec(screenSpec);
 
         TypeSpec.Builder builder = TypeSpec.classBuilder(screenSpec.getClassName().simpleName())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-//                .addSuperinterface(ParameterizedTypeName.get(ClassName.get(ComponentFactory.class), screenSpec.getComponentSpec().getParentTypeName()))
+                .addSuperinterface(ClassName.get(ScreenComponentFactory.class))
                 .addAnnotation(generatedAnnotationSpec)
-                .addAnnotation(autoComponentAnnotationSpec);
-//                .addAnnotation(autoInjectorAnnotationSpec);
-//                .addMethod(createComponentMethod)
-//                .addMethod(getComponentMethod);
+                .addAnnotation(autoComponentAnnotationSpec)
+                .addMethod(createComponentMethod)
+                .addMethod(getComponentMethod);
 
         // Superclass if provided
         if (screenSpec.getSuperclassTypeName() != null) {
@@ -150,14 +151,59 @@ public class MisunderstoodPoet {
         return builder;
     }
 
+    private MethodSpec buildScreenCreateComponentMethodSpec(ScreenSpec screenSpec) {
+
+        List<TypeName> params = new ArrayList<>();
+
+        // first param of "return $T.Builer"
+        params.add(ClassNames.daggerComponent(screenSpec.getComponentClassName()));
+
+        // build dependencies setters
+        StringBuilder dependenciesBuilder = new StringBuilder();
+        int i = 0;
+        for (AutoComponentMemberSpec spec : screenSpec.getComponentDependenciesSpecs()) {
+            dependenciesBuilder.append(".")
+                    .append(spec.getName())
+                    .append("(($T)dependencies[")
+                    .append(i)
+                    .append("])")
+                    .append("\n\t");
+            params.add(spec.getRealTypeName());
+        }
+
+        // build modules setters
+        StringBuilder modulesBuilder = new StringBuilder();
+        for (AutoComponentMemberSpec spec : screenSpec.getComponentModulesSpecs()) {
+            modulesBuilder.append(".")
+                    .append(spec.getName())
+                    .append("(new $T())")
+                    .append("\n\t");
+            params.add(spec.getTypeName());
+        }
+
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("createComponent")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(Object.class)
+                .addParameter(TypeName.get(Object[].class), "dependencies")
+                .varargs()
+                .addAnnotation(Override.class)
+                .addCode("return $T.builder()\n\t" +
+                        dependenciesBuilder.toString() +
+                        modulesBuilder.toString() +
+                        ".build();\n", params.toArray());
+
+
+        return builder.build();
+    }
+
     private AnnotationSpec buildAutoComponentAnnotationSpec(ScreenSpec screenSpec) {
         // modules are never empty
         AnnotationSpec.Builder builder = AnnotationSpec.builder(AutoComponent.class)
-                .addMember("modules", PoetUtils.getStringOfClassArrayTypes(screenSpec.getComponentModulesTypeNames().size()), screenSpec.getComponentModulesTypeNames().toArray());
+                .addMember("modules", PoetUtils.getStringOfClassArrayTypes(screenSpec.getComponentModulesSpecs().size()), SpecUtils.getTypeNames(screenSpec.getComponentModulesSpecs()));
 
         // dependencies
-        if (!screenSpec.getComponentDependenciesTypeNames().isEmpty()) {
-            builder.addMember("dependencies", PoetUtils.getStringOfClassArrayTypes(screenSpec.getComponentDependenciesTypeNames().size()), screenSpec.getComponentDependenciesTypeNames().toArray());
+        if (!screenSpec.getComponentDependenciesSpecs().isEmpty()) {
+            builder.addMember("dependencies", PoetUtils.getStringOfClassArrayTypes(screenSpec.getComponentDependenciesSpecs().size()), SpecUtils.getTypeNames(screenSpec.getComponentDependenciesSpecs()));
         }
 
         return builder.build();

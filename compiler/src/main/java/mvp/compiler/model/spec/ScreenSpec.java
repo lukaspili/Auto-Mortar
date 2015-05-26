@@ -17,12 +17,13 @@ public class ScreenSpec extends AbstractSpec {
 
     private final Element element;
     private TypeName superclassTypeName;
+    private ClassName componentClassName;
     private ModuleSpec moduleSpec;
     private AnnotationMirror scopeAnnotationMirror; // javapoet handles now AnnotationMirror types
     private List<InjectableVariableElement> screenParamMembers;
     private List<ScreenAnnotationSpec> annotationSpecs;
-    private List<TypeName> componentDependenciesTypeNames;
-    private List<TypeName> componentModulesTypeNames;
+    private List<AutoComponentMemberSpec> componentDependenciesSpecs;
+    private List<AutoComponentMemberSpec> componentModulesSpecs;
 
     public ScreenSpec(ClassName className, Element element) {
         super(className);
@@ -39,6 +40,14 @@ public class ScreenSpec extends AbstractSpec {
 
     public void setSuperclassTypeName(TypeName superclassTypeName) {
         this.superclassTypeName = superclassTypeName;
+    }
+
+    public ClassName getComponentClassName() {
+        return componentClassName;
+    }
+
+    public void setComponentClassName(ClassName componentClassName) {
+        this.componentClassName = componentClassName;
     }
 
     public ModuleSpec getModuleSpec() {
@@ -73,19 +82,19 @@ public class ScreenSpec extends AbstractSpec {
         this.annotationSpecs = annotationSpecs;
     }
 
-    public List<TypeName> getComponentDependenciesTypeNames() {
-        return componentDependenciesTypeNames;
+    public List<AutoComponentMemberSpec> getComponentDependenciesSpecs() {
+        return componentDependenciesSpecs;
     }
 
-    public void setComponentDependenciesTypeNames(List<TypeName> componentDependenciesTypeNames) {
-        this.componentDependenciesTypeNames = componentDependenciesTypeNames;
+    public void setComponentDependenciesSpecs(List<AutoComponentMemberSpec> componentDependenciesSpecs) {
+        this.componentDependenciesSpecs = componentDependenciesSpecs;
     }
 
-    public List<TypeName> getComponentModulesTypeNames() {
-        return componentModulesTypeNames;
+    public List<AutoComponentMemberSpec> getComponentModulesSpecs() {
+        return componentModulesSpecs;
     }
 
-    public void setComponentModulesTypeNames(List<TypeName> componentModulesTypeNames) {
-        this.componentModulesTypeNames = componentModulesTypeNames;
+    public void setComponentModulesSpecs(List<AutoComponentMemberSpec> componentModulesSpecs) {
+        this.componentModulesSpecs = componentModulesSpecs;
     }
 }

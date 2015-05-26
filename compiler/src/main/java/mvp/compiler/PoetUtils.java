@@ -1,6 +1,9 @@
 package mvp.compiler;
 
 import com.google.common.base.Preconditions;
+import com.squareup.javapoet.TypeName;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
@@ -30,5 +33,21 @@ public class PoetUtils {
 
         builder.append("}");
         return builder.toString();
+    }
+
+    /**
+     * TypeName looks like com.my.RootActivity.MyModule
+     *
+     * @return the correct builder method, like myModule
+     */
+    public static String daggerComponentBuilderMethodNameForModule(TypeName typeName) {
+        Preconditions.checkNotNull(typeName, "TypeName for component method builder cannot be null");
+        String full = typeName.toString();
+
+        int loc = full.lastIndexOf(".");
+        Preconditions.checkArgument(loc > -1, "Cannot find correct name for component method builder");
+        String name = full.substring(loc + 1, full.length());
+
+        return StringUtils.uncapitalize(name);
     }
 }

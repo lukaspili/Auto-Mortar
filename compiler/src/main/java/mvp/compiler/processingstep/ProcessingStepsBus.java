@@ -9,26 +9,8 @@ import mvp.compiler.model.Configuration;
  */
 public class ProcessingStepsBus {
 
-//    private List<WithInjectorExtractor> withInjectorExtractors;
-//    private List<WithComponentExtractor> withComponentExtractors;
     private Configuration configuration;
     private boolean configGenerated;
-
-//    public List<WithInjectorExtractor> getWithInjectorExtractors() {
-//        return withInjectorExtractors;
-//    }
-//
-//    public void setWithInjectorExtractors(List<WithInjectorExtractor> withInjectorExtractors) {
-//        this.withInjectorExtractors = withInjectorExtractors;
-//    }
-//
-//    public List<WithComponentExtractor> getWithComponentExtractors() {
-//        return withComponentExtractors;
-//    }
-//
-//    public void setWithComponentExtractors(List<WithComponentExtractor> withComponentExtractors) {
-//        this.withComponentExtractors = withComponentExtractors;
-//    }
 
     public Configuration getConfiguration() {
         return configuration;
