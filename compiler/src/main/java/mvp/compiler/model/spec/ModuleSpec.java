@@ -11,12 +11,18 @@ import mvp.compiler.model.InjectableVariableElement;
  */
 public class ModuleSpec extends AbstractSpec {
 
+    private final ScreenSpec screenSpec;
     private ClassName presenterClassName;
     private List<InjectableVariableElement> providePresenterParams;
     private List<InjectableVariableElement> providePresenterConstructorParams;
 
-    public ModuleSpec(ClassName className) {
+    public ModuleSpec(ClassName className, ScreenSpec screenSpec) {
         super(className);
+        this.screenSpec = screenSpec;
+    }
+
+    public ScreenSpec getScreenSpec() {
+        return screenSpec;
     }
 
     public ClassName getPresenterClassName() {

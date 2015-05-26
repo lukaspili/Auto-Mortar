@@ -3,17 +3,13 @@ apply plugin: 'java'
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
 dependencies {
     compile project(':library')
 
     compile 'com.google.auto:auto-common:0.4'
     compile 'com.google.auto.service:auto-service:1.0-rc2'
     compile 'com.google.guava:guava:18.0'
-    compile 'com.squareup:javapoet:1.0.0'
+    compile 'com.squareup:javapoet:1.1.0'
     compile 'org.apache.commons:commons-lang3:3.4'
 
     compile deps.dagger2
@@ -23,8 +19,6 @@ dependencies {
     compile deps.flow_navigation
 
     compile deps.mortar
-
-    compile group: 'com.github.lukaspili', name: 'autodagger', version: '0.1-SNAPSHOT', changing: true
 }
 
 apply from: '../mvn-publish.gradle'

@@ -14,7 +14,6 @@ import javax.lang.model.element.Element;
 public class ClassNames {
 
     public static final String SCREEN_PREFIX = "MVP_";
-    public static final String BASEVIEW_NAME = "View";
     public static final String SCREEN_NAME = "Screen";
     public static final String PRESENTER_NAME = "Presenter";
     public static final String COMPONENT_NAME = "Component";
@@ -40,7 +39,6 @@ public class ClassNames {
     private final Element element;
     private final String elementPackage;
     private final ClassName screenClassName;
-    private final ClassName baseViewClassName;
     private final ClassName componentClassName;
     private final ClassName moduleClassName;
     private final ClassName daggerComponentClassName;
@@ -54,7 +52,6 @@ public class ClassNames {
 
         elementPackage = MoreElements.getPackage(element).getQualifiedName().toString();
         screenClassName = ClassName.get(elementPackage, buildScreenName());
-        baseViewClassName = buildScreenInnerClassName(BASEVIEW_NAME);
         componentClassName = buildScreenInnerClassName(COMPONENT_NAME);
         moduleClassName = buildScreenInnerClassName(MODULE_NAME);
         daggerComponentClassName = ClassName.get(elementPackage, String.format("Dagger%s_%s", screenClassName.simpleName(), componentClassName.simpleName()));
@@ -80,10 +77,6 @@ public class ClassNames {
 
     public ClassName getScreenClassName() {
         return screenClassName;
-    }
-
-    public ClassName getBaseViewClassName() {
-        return baseViewClassName;
     }
 
     public ClassName getComponentClassName() {

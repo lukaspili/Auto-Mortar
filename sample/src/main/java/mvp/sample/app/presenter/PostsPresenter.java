@@ -8,11 +8,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import autodagger.autodagger.AutoComponent;
 import flow.Flow;
 import flownavigation.common.flow.Layout;
 import mortar.ViewPresenter;
-import mvp.MVP;
+import mvp.AutoScreen;
 import mvp.sample.R;
+import mvp.sample.app.DaggerScope;
 import mvp.sample.app.adapter.PostAdapter;
 import mvp.sample.model.Post;
 import mvp.sample.rest.RestClient;
@@ -26,10 +28,11 @@ import timber.log.Timber;
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
-@MVP(
-        parent = RootActivity.class,
+@AutoScreen(
+        component = @AutoComponent(dependencies = RootActivity.class),
         screenAnnotations = Layout.class
 )
+@DaggerScope(PostsPresenter.class)
 @Layout(R.layout.screen_posts)
 public class PostsPresenter extends ViewPresenter<PostsView> implements PostAdapter.Listener {
 
@@ -38,7 +41,6 @@ public class PostsPresenter extends ViewPresenter<PostsView> implements PostAdap
     private PostAdapter adapter;
     private List<Post> posts = new ArrayList<>();
 
-    @Inject
     public PostsPresenter(RestClient restClient) {
         this.restClient = restClient;
     }

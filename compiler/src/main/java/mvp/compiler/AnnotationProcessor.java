@@ -9,7 +9,7 @@ import javax.lang.model.SourceVersion;
 
 import mvp.compiler.message.MessageDelivery;
 import mvp.compiler.processingstep.ConfigurationProcessingStep;
-import mvp.compiler.processingstep.MvpProcessingStep;
+import mvp.compiler.processingstep.ScreenProcessingStep;
 import mvp.compiler.processingstep.ProcessingStepsBus;
 
 /**
@@ -25,7 +25,7 @@ public class AnnotationProcessor extends BasicAnnotationProcessor {
     protected Iterable<? extends ProcessingStep> initSteps() {
         return ImmutableSet.of(
                 new ConfigurationProcessingStep(messageDelivery, processingStepsBus),
-                new MvpProcessingStep(processingEnv.getTypeUtils(), processingEnv.getElementUtils(), processingEnv.getFiler(), messageDelivery, processingStepsBus)
+                new ScreenProcessingStep(processingEnv.getTypeUtils(), processingEnv.getElementUtils(), processingEnv.getFiler(), messageDelivery, processingStepsBus)
         );
     }
 

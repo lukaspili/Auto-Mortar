@@ -15,7 +15,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 
 import autodagger.autodagger.AutoComponent;
-import autodagger.autodagger.AutoExpose;
 import dagger.Module;
 import dagger.Provides;
 import mvp.compiler.model.InjectableVariableElement;
@@ -48,6 +47,11 @@ public class MisunderstoodPoet {
                 .returns(moduleSpec.getPresenterClassName())
                 .addAnnotation(Provides.class);
 
+        // Scope annotation if any
+        if (moduleSpec.getScreenSpec().getScopeAnnotationMirror() != null) {
+            builder.addAnnotation(AnnotationSpec.get(moduleSpec.getScreenSpec().getScopeAnnotationMirror()));
+        }
+
         for (InjectableVariableElement injectableVariableElement : moduleSpec.getProvidePresenterParams()) {
             builder.addParameter(TypeName.get(injectableVariableElement.getElement().asType()), injectableVariableElement.getElement().getSimpleName().toString());
         }
@@ -75,8 +79,7 @@ public class MisunderstoodPoet {
                 .build();
 
         // @AutoComponent
-        AnnotationSpec autoComponentAnnotationSpec = AnnotationSpec.builder(AutoComponent.class)
-                .build();
+        AnnotationSpec autoComponentAnnotationSpec = buildAutoComponentAnnotationSpec(screenSpec);
 
         // static getComponent(Context)
 //        MethodSpec getComponentMethod = MethodSpec.methodBuilder("getComponent")
@@ -106,8 +109,14 @@ public class MisunderstoodPoet {
 //                .addMethod(createComponentMethod)
 //                .addMethod(getComponentMethod);
 
+        // Superclass if provided
         if (screenSpec.getSuperclassTypeName() != null) {
             builder.superclass(screenSpec.getSuperclassTypeName());
+        }
+
+        // Scope annotation if provided
+        if (screenSpec.getScopeAnnotationMirror() != null) {
+            builder.addAnnotation(AnnotationSpec.get(screenSpec.getScopeAnnotationMirror()));
         }
 
         if (screenSpec.getAnnotationSpecs() != null) {
@@ -139,6 +148,19 @@ public class MisunderstoodPoet {
         }
 
         return builder;
+    }
+
+    private AnnotationSpec buildAutoComponentAnnotationSpec(ScreenSpec screenSpec) {
+        // modules are never empty
+        AnnotationSpec.Builder builder = AnnotationSpec.builder(AutoComponent.class)
+                .addMember("modules", PoetUtils.getStringOfClassArrayTypes(screenSpec.getComponentModulesTypeNames().size()), screenSpec.getComponentModulesTypeNames().toArray());
+
+        // dependencies
+        if (!screenSpec.getComponentDependenciesTypeNames().isEmpty()) {
+            builder.addMember("dependencies", PoetUtils.getStringOfClassArrayTypes(screenSpec.getComponentDependenciesTypeNames().size()), screenSpec.getComponentDependenciesTypeNames().toArray());
+        }
+
+        return builder.build();
     }
 
     public TypeSpec compose(ConfigSpec configSpec) {

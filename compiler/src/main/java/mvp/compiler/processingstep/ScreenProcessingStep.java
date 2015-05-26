@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.io.PrintWriter;
@@ -30,13 +31,14 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import mvp.MVP;
+import mvp.AutoScreen;
 import mvp.ScreenParam;
 import mvp.compiler.MisunderstoodPoet;
-import mvp.compiler.extractor.ElementExtractor;
+import mvp.compiler.extractor.ScreenExtractor;
 import mvp.compiler.message.Message;
 import mvp.compiler.message.MessageDelivery;
 import mvp.compiler.model.Configuration;
@@ -50,7 +52,7 @@ import mvp.compiler.names.ClassNames;
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
-public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingStep {
+public class ScreenProcessingStep implements BasicAnnotationProcessor.ProcessingStep {
 
     private final Types types;
     private final Elements elements;
@@ -59,7 +61,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
     private final ProcessingStepsBus processingStepsBus;
     private final MisunderstoodPoet misunderstoodPoet;
 
-    public MvpProcessingStep(Types types, Elements elements, Filer filer, MessageDelivery messageDelivery, ProcessingStepsBus processingStepsBus) {
+    public ScreenProcessingStep(Types types, Elements elements, Filer filer, MessageDelivery messageDelivery, ProcessingStepsBus processingStepsBus) {
         Preconditions.checkNotNull(types);
         Preconditions.checkNotNull(elements);
         Preconditions.checkNotNull(filer);
@@ -77,7 +79,7 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
 
     @Override
     public Set<? extends Class<? extends Annotation>> annotations() {
-        return ImmutableSet.<Class<? extends Annotation>>of(MVP.class);
+        return ImmutableSet.<Class<? extends Annotation>>of(AutoScreen.class);
     }
 
     @Override
@@ -92,17 +94,17 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         for (Class<? extends Annotation> annotation : elementsByAnnotation.keySet()) {
             Set<Element> elements = elementsByAnnotation.get(annotation);
             for (Element element : elements) {
-                ElementExtractor elementExtractor = new ElementExtractor(element, annotation, types, this.elements);
+                ScreenExtractor screenExtractor = new ScreenExtractor(element, annotation, types, this.elements);
 
-                boolean valid = validateElement(elementExtractor);
+                boolean valid = validateElement(screenExtractor);
                 if (!valid) {
                     // do not try to build screen for already invalid element
                     continue;
                 }
 
-                ClassNames classNames = new ClassNames(elementExtractor.getElement());
+                ClassNames classNames = new ClassNames(screenExtractor.getElement());
 
-                ScreenSpec screenSpec = buildScreen(elementExtractor, classNames, configuration);
+                ScreenSpec screenSpec = buildScreen(screenExtractor, classNames, configuration);
                 Preconditions.checkNotNull(screenSpec);
                 screenSpecs.add(screenSpec);
             }
@@ -123,26 +125,66 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         return configSpec;
     }
 
-    private ScreenSpec buildScreen(ElementExtractor elementExtractor, ClassNames classNames, Configuration configuration) {
-        Preconditions.checkNotNull(elementExtractor);
+    private ScreenSpec buildScreen(ScreenExtractor screenExtractor, ClassNames classNames, Configuration configuration) {
+        Preconditions.checkNotNull(screenExtractor);
         Preconditions.checkNotNull(classNames);
 
-        ScreenSpec screenSpec = new ScreenSpec(classNames.getScreenClassName(), elementExtractor.getElement());
-        screenSpec.setDaggerComponentTypeName(classNames.getDaggerComponentClassName());
-        screenSpec.setPresenterTypeName(classNames.getPresenterClassName());
+        ScreenSpec screenSpec = new ScreenSpec(classNames.getScreenClassName(), screenExtractor.getElement());
 
-        // screen superclass, first let's see if user specified a superclass on @MVP
-        // otherwise use config
-        // if config provides null, screen will have no superclass
-        if (elementExtractor.getScreenSuperclassTypeMirror() != null) {
-            screenSpec.setSuperclassTypeName(ClassName.get(elementExtractor.getScreenSuperclassTypeMirror()));
-        } else if (configuration.getScreenSuperclassTypeName() != null) {
-            screenSpec.setSuperclassTypeName(configuration.getScreenSuperclassTypeName());
-        }
+        // screen superclass
+        screenSpec.setSuperclassTypeName(configuration.getScreenSuperclassTypeName());
+
+        // dagger scope
+        screenSpec.setScopeAnnotationMirror(screenExtractor.getScopeAnnotationTypeMirror());
+
+        // component dependencies
+        screenSpec.setComponentDependenciesTypeNames(buildComponentTypeNames(screenExtractor.getComponentDependencies()));
+
+        // component modules, + add the screen module
+        List<TypeName> modulesTypeNames = buildComponentTypeNames(screenExtractor.getComponentModules());
+        modulesTypeNames.add(classNames.getModuleClassName());
+        screenSpec.setComponentModulesTypeNames(modulesTypeNames);
 
         // screen annotations
+        List<ScreenAnnotationSpec> annotationSpecs = buildScreenAnnotationSpecs(screenExtractor);
+        if (!annotationSpecs.isEmpty()) {
+            screenSpec.setAnnotationSpecs(annotationSpecs);
+        }
+
+        List<InjectableVariableElement> injectableParams = buildInjectableParams(screenExtractor);
+        Preconditions.checkNotNull(injectableParams);
+
+        List<InjectableVariableElement> screenParamsMembers = Lists.newArrayList(Collections2.filter(injectableParams, new Predicate<InjectableVariableElement>() {
+            @Override
+            public boolean apply(InjectableVariableElement input) {
+                return input.isScreenParam();
+            }
+        }));
+        screenSpec.setScreenParamMembers(screenParamsMembers);
+
+        // module
+        ModuleSpec moduleSpec = buildModule(screenExtractor, screenSpec, classNames, injectableParams);
+        screenSpec.setModuleSpec(moduleSpec);
+
+        return screenSpec;
+    }
+
+    private List<TypeName> buildComponentTypeNames(List<TypeMirror> typeMirrors) {
+        List<TypeName> typeNames = new ArrayList<>();
+        if (typeMirrors == null) {
+            return typeNames;
+        }
+
+        for (TypeMirror typeMirror : typeMirrors) {
+            typeNames.add(TypeName.get(typeMirror));
+        }
+
+        return typeNames;
+    }
+
+    private List<ScreenAnnotationSpec> buildScreenAnnotationSpecs(ScreenExtractor screenExtractor) {
         List<ScreenAnnotationSpec> annotationSpecs = new ArrayList<>();
-        for (AnnotationMirror annotationTypeMirror : elementExtractor.getScreenAnnotationsMirrors()) {
+        for (AnnotationMirror annotationTypeMirror : screenExtractor.getScreenAnnotationsMirrors()) {
             Element e = MoreTypes.asElement(annotationTypeMirror.getAnnotationType());
             TypeElement te = MoreElements.asType(e);
             ScreenAnnotationSpec spec = new ScreenAnnotationSpec(ClassName.get(te));
@@ -154,33 +196,13 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
             }
         }
 
-        if (!annotationSpecs.isEmpty()) {
-            screenSpec.setAnnotationSpecs(annotationSpecs);
-        }
-
-        List<InjectableVariableElement> injectableParams = buildInjectableParams(elementExtractor);
-        Preconditions.checkNotNull(injectableParams);
-
-        List<InjectableVariableElement> screenParamsMembers = Lists.newArrayList(Collections2.filter(injectableParams, new Predicate<InjectableVariableElement>() {
-            @Override
-            public boolean apply(InjectableVariableElement input) {
-                return input.isScreenParam();
-            }
-        }));
-        screenSpec.setScreenParamMembers(screenParamsMembers);
-
-        ModuleSpec moduleSpec = buildModule(elementExtractor, classNames, injectableParams);
-        Preconditions.checkNotNull(moduleSpec);
-        screenSpec.setModuleSpec(moduleSpec);
-
-        return screenSpec;
+        return annotationSpecs;
     }
 
-    private List<InjectableVariableElement> buildInjectableParams(ElementExtractor elementExtractor) {
+    private List<InjectableVariableElement> buildInjectableParams(ScreenExtractor screenExtractor) {
         List<InjectableVariableElement> injectableParams = new ArrayList<>();
-        for (Element enclosedElement : elementExtractor.getElement().getEnclosedElements()) {
-            if (enclosedElement.getKind() == ElementKind.CONSTRUCTOR &&
-                    MoreElements.isAnnotationPresent(enclosedElement, Inject.class)) {
+        for (Element enclosedElement : screenExtractor.getElement().getEnclosedElements()) {
+            if (enclosedElement.getKind() == ElementKind.CONSTRUCTOR) {
                 for (VariableElement variableElement : MoreElements.asExecutable(enclosedElement).getParameters()) {
                     injectableParams.add(new InjectableVariableElement(variableElement, MoreElements.isAnnotationPresent(variableElement, ScreenParam.class)));
                 }
@@ -190,11 +212,11 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
         return injectableParams;
     }
 
-    private ModuleSpec buildModule(ElementExtractor elementExtractor, ClassNames classNames, List<InjectableVariableElement> injectableParams) {
-        Preconditions.checkNotNull(elementExtractor);
+    private ModuleSpec buildModule(ScreenExtractor screenExtractor, ScreenSpec screenSpec, ClassNames classNames, List<InjectableVariableElement> injectableParams) {
+        Preconditions.checkNotNull(screenExtractor);
         Preconditions.checkNotNull(classNames);
 
-        ModuleSpec moduleSpec = new ModuleSpec(classNames.getModuleClassName());
+        ModuleSpec moduleSpec = new ModuleSpec(classNames.getModuleClassName(), screenSpec);
         moduleSpec.setPresenterClassName(classNames.getPresenterClassName());
         moduleSpec.setProvidePresenterConstructorParams(injectableParams);
 
@@ -204,64 +226,19 @@ public class MvpProcessingStep implements BasicAnnotationProcessor.ProcessingSte
                 return !input.isScreenParam();
             }
         }));
-        moduleSpec.setProvidePresenterParams(methodParams);
+        moduleSpec.setProvidePresenterParams(injectableParams);
 
         return moduleSpec;
     }
 
-//    private ComponentSpec buildComponent(ElementExtractor elementExtractor, ClassNames classNames, List<WithInjectorExtractor> withInjectorExtractors, List<WithComponentExtractor> withComponentExtractors) {
-//        Preconditions.checkNotNull(elementExtractor);
-//        Preconditions.checkNotNull(classNames);
-//
-//        ComponentSpec componentSpec = new ComponentSpec(classNames.getComponentClassName());
-//        componentSpec.setModuleTypeName(classNames.getModuleClassName());
-//
-//        // parent can be comp interface or presenter
-//        Element e = MoreTypes.asElement(elementExtractor.getParentTypeMirror());
-//        if (MoreElements.isAnnotationPresent(e, Component.class)) {
-//            componentSpec.setParentTypeName(TypeName.get(elementExtractor.getParentTypeMirror()));
-//        } else if (MoreElements.isAnnotationPresent(e, MVP.class)) {
-//            ClassNames elementClassNames = new ClassNames(e);
-//            componentSpec.setParentTypeName(elementClassNames.getComponentClassName());
-//        } else {
-//            throw new IllegalStateException("@MVP parent must be a dagger 2 component or an @MVP annotated presenter");
-//        }
-//
-//        List<WithInjectorSpec> withInjectorSpecs = new ArrayList<>();
-//        if (withInjectorExtractors != null) {
-//            for (WithInjectorExtractor extractor : withInjectorExtractors) {
-//                for (TypeMirror typeMirror : extractor.getTypeMirrors()) {
-//                    if (types.isSameType(elementExtractor.getElement().asType(), typeMirror)) {
-////                    String name = extractor.getElement().getSimpleName().toString().toLowerCase();
-//                        withInjectorSpecs.add(new WithInjectorSpec("view", TypeName.get(extractor.getElement().asType())));
-//                    }
-//                }
-//            }
-//        }
-//        componentSpec.setWithInjectorSpecs(withInjectorSpecs);
-//
-//        List<WithComponentSpec> withComponentSpecs = new ArrayList<>();
-//        if (withComponentExtractors != null) {
-//            for (WithComponentExtractor extractor : withComponentExtractors) {
-//                for (TypeMirror typeMirror : extractor.getTypeMirrors()) {
-//                    if (types.isSameType(elementExtractor.getElement().asType(), typeMirror)) {
-//                        String name = extractor.getElement().getSimpleName().toString();
-//                        name = WordUtils.uncapitalize(name);
-//                        withComponentSpecs.add(new WithComponentSpec(name, TypeName.get(extractor.getElement().asType())));
-//                    }
-//                }
-//            }
-//        }
-//        componentSpec.setWithComponentSpecs(withComponentSpecs);
-//
-//        return componentSpec;
-//    }
+    private boolean validateElement(ScreenExtractor screenExtractor) {
+        Preconditions.checkNotNull(screenExtractor);
 
-    private boolean validateElement(ElementExtractor elementExtractor) {
-        Preconditions.checkNotNull(elementExtractor);
+        if (screenExtractor.isErrors()) {
+            for (Message message : screenExtractor.getMessages()) {
+                messageDelivery.add(message);
+            }
 
-        if (elementExtractor.getParentTypeMirror() == null) {
-            messageDelivery.add(Message.error(elementExtractor.getElement(), "@MVP requires parentComponent to be defined."));
             return false;
         }
 

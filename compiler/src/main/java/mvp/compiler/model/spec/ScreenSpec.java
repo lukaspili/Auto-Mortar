@@ -5,6 +5,7 @@ import com.squareup.javapoet.TypeName;
 
 import java.util.List;
 
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 
 import mvp.compiler.model.InjectableVariableElement;
@@ -16,16 +17,20 @@ public class ScreenSpec extends AbstractSpec {
 
     private final Element element;
     private TypeName superclassTypeName;
-    private ClassName layoutAnnotationClassName;
     private ModuleSpec moduleSpec;
-    private ClassName daggerComponentTypeName;
-    private TypeName presenterTypeName;
+    private AnnotationMirror scopeAnnotationMirror; // javapoet handles now AnnotationMirror types
     private List<InjectableVariableElement> screenParamMembers;
     private List<ScreenAnnotationSpec> annotationSpecs;
+    private List<TypeName> componentDependenciesTypeNames;
+    private List<TypeName> componentModulesTypeNames;
 
     public ScreenSpec(ClassName className, Element element) {
         super(className);
         this.element = element;
+    }
+
+    public Element getElement() {
+        return element;
     }
 
     public TypeName getSuperclassTypeName() {
@@ -36,14 +41,6 @@ public class ScreenSpec extends AbstractSpec {
         this.superclassTypeName = superclassTypeName;
     }
 
-    public ClassName getLayoutAnnotationClassName() {
-        return layoutAnnotationClassName;
-    }
-
-    public void setLayoutAnnotationClassName(ClassName layoutAnnotationClassName) {
-        this.layoutAnnotationClassName = layoutAnnotationClassName;
-    }
-
     public ModuleSpec getModuleSpec() {
         return moduleSpec;
     }
@@ -52,20 +49,12 @@ public class ScreenSpec extends AbstractSpec {
         this.moduleSpec = moduleSpec;
     }
 
-    public ClassName getDaggerComponentTypeName() {
-        return daggerComponentTypeName;
+    public AnnotationMirror getScopeAnnotationMirror() {
+        return scopeAnnotationMirror;
     }
 
-    public void setDaggerComponentTypeName(ClassName daggerComponentTypeName) {
-        this.daggerComponentTypeName = daggerComponentTypeName;
-    }
-
-    public TypeName getPresenterTypeName() {
-        return presenterTypeName;
-    }
-
-    public void setPresenterTypeName(TypeName presenterTypeName) {
-        this.presenterTypeName = presenterTypeName;
+    public void setScopeAnnotationMirror(AnnotationMirror scopeAnnotationMirror) {
+        this.scopeAnnotationMirror = scopeAnnotationMirror;
     }
 
     public List<InjectableVariableElement> getScreenParamMembers() {
@@ -76,15 +65,27 @@ public class ScreenSpec extends AbstractSpec {
         this.screenParamMembers = screenParamMembers;
     }
 
-    public Element getElement() {
-        return element;
-    }
-
     public List<ScreenAnnotationSpec> getAnnotationSpecs() {
         return annotationSpecs;
     }
 
     public void setAnnotationSpecs(List<ScreenAnnotationSpec> annotationSpecs) {
         this.annotationSpecs = annotationSpecs;
+    }
+
+    public List<TypeName> getComponentDependenciesTypeNames() {
+        return componentDependenciesTypeNames;
+    }
+
+    public void setComponentDependenciesTypeNames(List<TypeName> componentDependenciesTypeNames) {
+        this.componentDependenciesTypeNames = componentDependenciesTypeNames;
+    }
+
+    public List<TypeName> getComponentModulesTypeNames() {
+        return componentModulesTypeNames;
+    }
+
+    public void setComponentModulesTypeNames(List<TypeName> componentModulesTypeNames) {
+        this.componentModulesTypeNames = componentModulesTypeNames;
     }
 }
