@@ -30,18 +30,18 @@ public class PostsView extends FrameLayout {
 
     public PostsView(Context context, AttributeSet attrs) {
         super(context, attrs);
-//        DaggerService.<MVP_PostsScreen_Component>getDaggerComponent(context).inject(this);
+        DaggerService.<MVP_PostsScreen_Component>getDaggerComponent(context).inject(this);
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        presenter.takeView(this);
+//        presenter.takeView(this);
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        presenter.dropView(this);
+//        presenter.dropView(this);
         super.onDetachedFromWindow();
     }
 

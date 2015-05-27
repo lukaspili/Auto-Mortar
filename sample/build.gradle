@@ -40,6 +40,10 @@ android {
     }
 }
 
+//configurations.all {
+//    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+//}
+
 dependencies {
     apt project(':compiler')
     compile project(':library')

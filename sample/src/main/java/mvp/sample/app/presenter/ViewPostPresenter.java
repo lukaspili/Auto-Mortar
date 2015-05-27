@@ -27,12 +27,11 @@ import timber.log.Timber;
 @Layout(R.layout.screen_view_post)
 public class ViewPostPresenter extends ViewPresenter<ViewPostView> {
 
-    private final Post post;
+    private Post post;
 
-    @Inject
-    public ViewPostPresenter(@ScreenParam Post post) {
-        this.post = post;
-    }
+//    public ViewPostPresenter(@ScreenParam Post post) {
+//        this.post = post;
+//    }
 
     @Override
     protected void onLoad(Bundle savedInstanceState) {

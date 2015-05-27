@@ -9,6 +9,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import autodagger.AutoComponent;
+import autodagger.AutoExpose;
 import flow.Flow;
 import flownavigation.common.flow.Layout;
 import mortar.ViewPresenter;
@@ -32,6 +33,7 @@ import timber.log.Timber;
         component = @AutoComponent(dependencies = RootActivity.class),
         screenAnnotations = Layout.class
 )
+@AutoExpose()
 @DaggerScope(PostsPresenter.class)
 @Layout(R.layout.screen_posts)
 public class PostsPresenter extends ViewPresenter<PostsView> implements PostAdapter.Listener {
@@ -92,6 +94,6 @@ public class PostsPresenter extends ViewPresenter<PostsView> implements PostAdap
         if (!hasView()) return;
 
         Post post = posts.get(position);
-        Flow.get(getView()).set(new MVP_ViewPostScreen(post));
+//        Flow.get(getView()).set(new MVP_ViewPostScreen(post));
     }
 }

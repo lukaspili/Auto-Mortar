@@ -37,7 +37,7 @@ public class ScreenExtractor {
     private List<Message> messages = new ArrayList<>();
     private boolean errors;
 
-    public ScreenExtractor(Element element, Class<? extends Annotation> annotation, Types types, Elements elements) {
+    public ScreenExtractor(Element element, Types types, Elements elements) {
         this.element = element;
 
         AnnotationMirror autoComponent = Utils.getValueFromAnnotation(element, AutoScreen.class, COMPONENT);

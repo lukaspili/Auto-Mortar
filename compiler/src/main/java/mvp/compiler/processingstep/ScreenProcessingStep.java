@@ -1,14 +1,11 @@
 package mvp.compiler.processingstep;
 
-import com.google.auto.common.BasicAnnotationProcessor;
 import com.google.auto.common.MoreElements;
 import com.google.auto.common.MoreTypes;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.SetMultimap;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeName;
@@ -55,7 +52,7 @@ import mvp.compiler.names.ClassNames;
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
-public class ScreenProcessingStep implements BasicAnnotationProcessor.ProcessingStep {
+public class ScreenProcessingStep implements ProcessingStep {
 
     private final Types types;
     private final Elements elements;
@@ -81,12 +78,13 @@ public class ScreenProcessingStep implements BasicAnnotationProcessor.Processing
     }
 
     @Override
-    public Set<? extends Class<? extends Annotation>> annotations() {
-        return ImmutableSet.<Class<? extends Annotation>>of(AutoScreen.class);
+    public Class<? extends Annotation> annotation() {
+        return AutoScreen.class;
     }
 
     @Override
-    public void process(SetMultimap<Class<? extends Annotation>, Element> elementsByAnnotation) {
+    public void process(Set<? extends Element> elements) {
+        System.out.println("@AutoScreen Processing Step");
         // get user configuration, or default one if none provided
         Configuration configuration = processingStepsBus.getConfiguration();
         if (configuration == null) {
@@ -94,24 +92,23 @@ public class ScreenProcessingStep implements BasicAnnotationProcessor.Processing
         }
 
         List<ScreenSpec> screenSpecs = new ArrayList<>();
-        for (Class<? extends Annotation> annotation : elementsByAnnotation.keySet()) {
-            Set<Element> elements = elementsByAnnotation.get(annotation);
-            for (Element element : elements) {
-                ScreenExtractor screenExtractor = new ScreenExtractor(element, annotation, types, this.elements);
 
-                boolean valid = validateElement(screenExtractor);
-                if (!valid) {
-                    // do not try to build screen for already invalid element
-                    continue;
-                }
+        for (Element element : elements) {
+            ScreenExtractor screenExtractor = new ScreenExtractor(element, this.types, this.elements);
 
-                ClassNames classNames = new ClassNames(screenExtractor.getElement());
-
-                ScreenSpec screenSpec = buildScreen(screenExtractor, classNames, configuration);
-                Preconditions.checkNotNull(screenSpec);
-                screenSpecs.add(screenSpec);
+            boolean valid = validateElement(screenExtractor);
+            if (!valid) {
+                // do not try to build screen for already invalid element
+                continue;
             }
+
+            ClassNames classNames = new ClassNames(screenExtractor.getElement());
+
+            ScreenSpec screenSpec = buildScreen(screenExtractor, classNames, configuration);
+            Preconditions.checkNotNull(screenSpec);
+            screenSpecs.add(screenSpec);
         }
+
 
         ConfigSpec configSpec = buildConfig(configuration);
         Preconditions.checkNotNull(configSpec, "Config spec is null");
@@ -131,6 +128,8 @@ public class ScreenProcessingStep implements BasicAnnotationProcessor.Processing
     private ScreenSpec buildScreen(ScreenExtractor screenExtractor, ClassNames classNames, Configuration configuration) {
         Preconditions.checkNotNull(screenExtractor);
         Preconditions.checkNotNull(classNames);
+
+        System.out.println("Buid screen " + screenExtractor.getElement().getSimpleName());
 
         ScreenSpec screenSpec = new ScreenSpec(classNames.getScreenClassName(), screenExtractor.getElement());
 
