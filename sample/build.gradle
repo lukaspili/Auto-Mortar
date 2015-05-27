@@ -65,6 +65,8 @@ dependencies {
     compile 'com.jakewharton.timber:timber:2.7.1'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
 
-    compile group: 'com.github.lukaspili', name: 'autodagger', version: '0.2-SNAPSHOT', changing: true
-    apt group: 'com.github.lukaspili', name: 'autodagger-compiler', version: '0.2-SNAPSHOT', changing: true
+    compile deps.autodagger2
+    apt deps.autodagger2_compiler
+//    compile group: 'com.github.lukaspili', name: 'autodagger', version: '0.3-SNAPSHOT', changing: true
+//    apt group: 'com.github.lukaspili', name: 'autodagger-compiler', version: '0.3-SNAPSHOT', changing: true
 }

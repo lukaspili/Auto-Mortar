@@ -13,13 +13,14 @@ sourceSets {
     }
 }
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
+//configurations.all {
+//    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+//}
 
 dependencies {
     compile deps.mortar
-    compile group: 'com.github.lukaspili', name: 'autodagger', version: '0.2-SNAPSHOT', changing: true
+    compile deps.autodagger2
+//    compile group: 'com.github.lukaspili', name: 'autodagger', version: '0.3-SNAPSHOT', changing: true
 
     provided 'javax.inject:javax.inject:1'
     provided deps.android

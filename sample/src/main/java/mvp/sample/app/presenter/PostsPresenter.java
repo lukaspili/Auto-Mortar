@@ -94,6 +94,6 @@ public class PostsPresenter extends ViewPresenter<PostsView> implements PostAdap
         if (!hasView()) return;
 
         Post post = posts.get(position);
-//        Flow.get(getView()).set(new MVP_ViewPostScreen(post));
+        Flow.get(getView()).set(new ViewPostScreen(post));
     }
 }

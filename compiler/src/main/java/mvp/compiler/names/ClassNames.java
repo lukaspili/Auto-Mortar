@@ -3,7 +3,6 @@ package mvp.compiler.names;
 import com.google.auto.common.MoreElements;
 import com.google.common.base.Preconditions;
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.TypeName;
 
 import javax.lang.model.element.Element;
 
@@ -14,11 +13,11 @@ import javax.lang.model.element.Element;
  */
 public class ClassNames {
 
-    public static final String SCREEN_PREFIX = "MVP_";
     public static final String SCREEN_NAME = "Screen";
     public static final String PRESENTER_NAME = "Presenter";
     public static final String MODULE_NAME = "Module";
-    public static final String CONFIG_NAME = "MVP_Config";
+    public static final String CONFIG_NAME = "AutoMortar_Config";
+    public static final String COMPONENT_NAME = "Component";
 
     public static ClassName context() {
         return ClassName.get("android.content", "Context");
@@ -26,6 +25,10 @@ public class ClassNames {
 
     public static final ClassName mvpConfig() {
         return ClassName.get("generatedmvp", CONFIG_NAME);
+    }
+
+    public static String componentName(String name) {
+        return String.format("%s%s", name, COMPONENT_NAME);
     }
 
     public static ClassName daggerComponent(ClassName component) {
@@ -47,7 +50,7 @@ public class ClassNames {
 
         elementPackage = MoreElements.getPackage(element).getQualifiedName().toString();
         screenClassName = ClassName.get(elementPackage, buildScreenName());
-        componentClassName = ClassName.get(elementPackage, String.format("%s_Component", screenClassName.simpleName()));
+        componentClassName = ClassName.get(elementPackage, componentName(screenClassName.simpleName()));
         moduleClassName = buildScreenInnerClassName(MODULE_NAME);
         presenterClassName = ClassName.get(elementPackage, element.getSimpleName().toString());
     }
@@ -62,7 +65,7 @@ public class ClassNames {
         if (res != -1 && res + PRESENTER_NAME.length() == name.length()) {
             name = name.substring(0, res);
         }
-        return String.format("%s%s%s", SCREEN_PREFIX, name, SCREEN_NAME);
+        return String.format("%s%s", name, SCREEN_NAME);
     }
 
     private ClassName buildScreenInnerClassName(String name) {

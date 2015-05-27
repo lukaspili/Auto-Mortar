@@ -11,7 +11,9 @@ import autodagger.AutoInjector;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import mvp.sample.R;
+import mvp.sample.app.DaggerService;
 import mvp.sample.app.presenter.ViewPostPresenter;
+import mvp.sample.app.presenter.ViewPostScreenComponent;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
@@ -30,6 +32,7 @@ public class ViewPostView extends LinearLayout {
 
     public ViewPostView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        DaggerService.<ViewPostScreenComponent>getDaggerComponent(context).inject(this);
     }
 
     @Override

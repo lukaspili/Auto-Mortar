@@ -186,10 +186,10 @@ public class ScreenProcessingStep implements ProcessingStep {
         }
 
         for (TypeMirror typeMirror : typeMirrors) {
+            Element element = MoreTypes.asElement(typeMirror);
             String name;
             TypeName typeName = TypeName.get(typeMirror);
             TypeName realTypeName;
-            Element element = MoreTypes.asElement(typeMirror);
 
             if (dependencies) {
                 // dependencies means type mirror is a component OR a class annotated with @AutoComponent / @AutoScreen
@@ -199,8 +199,9 @@ public class ScreenProcessingStep implements ProcessingStep {
                     realTypeName = typeName;
                 } else {
                     // generated component, add _Component at the end
-                    name = StringUtils.uncapitalize(String.format("%s_Component", element.getSimpleName().toString()));
-                    realTypeName = ClassName.get(MoreElements.getPackage(element).toString(), String.format("%s_Component", element.getSimpleName().toString()));
+                    ClassName className = ClassName.get(MoreElements.getPackage(element).toString(), ClassNames.componentName(element.getSimpleName().toString()));
+                    name = StringUtils.uncapitalize(className.simpleName().toString());
+                    realTypeName = className;
                 }
             } else {
                 // module

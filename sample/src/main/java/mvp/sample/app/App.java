@@ -28,7 +28,7 @@ public class App extends Application {
             Timber.plant(new Timber.DebugTree());
         }
 
-        App_Component component = DaggerApp_Component.builder()
+        AppComponent component = DaggerAppComponent.builder()
                 .build();
         component.inject(this);
 
