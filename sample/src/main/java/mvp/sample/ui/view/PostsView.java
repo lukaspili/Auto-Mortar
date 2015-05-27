@@ -36,12 +36,12 @@ public class PostsView extends FrameLayout {
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-//        presenter.takeView(this);
+        presenter.takeView(this);
     }
 
     @Override
     protected void onDetachedFromWindow() {
-//        presenter.dropView(this);
+        presenter.dropView(this);
         super.onDetachedFromWindow();
     }
 

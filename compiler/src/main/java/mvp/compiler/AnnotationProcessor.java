@@ -35,7 +35,6 @@ public class AnnotationProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-        System.out.println("INIT Auto Mortar Annotation Processor");
 
         processingSteps = new LinkedHashSet<>();
         processingSteps.add(new ConfigurationProcessingStep(messageDelivery, processingStepsBus));
@@ -45,7 +44,6 @@ public class AnnotationProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if (stop) return false;
-        System.out.println("PROCESS Auto Mortar Annotation Processor");
 
         for (ProcessingStep processingStep : processingSteps) {
             Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(processingStep.annotation());

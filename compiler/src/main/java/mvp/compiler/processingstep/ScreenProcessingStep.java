@@ -84,7 +84,6 @@ public class ScreenProcessingStep implements ProcessingStep {
 
     @Override
     public void process(Set<? extends Element> elements) {
-        System.out.println("@AutoScreen Processing Step");
         // get user configuration, or default one if none provided
         Configuration configuration = processingStepsBus.getConfiguration();
         if (configuration == null) {
@@ -128,8 +127,6 @@ public class ScreenProcessingStep implements ProcessingStep {
     private ScreenSpec buildScreen(ScreenExtractor screenExtractor, ClassNames classNames, Configuration configuration) {
         Preconditions.checkNotNull(screenExtractor);
         Preconditions.checkNotNull(classNames);
-
-        System.out.println("Buid screen " + screenExtractor.getElement().getSimpleName());
 
         ScreenSpec screenSpec = new ScreenSpec(classNames.getScreenClassName(), screenExtractor.getElement());
 
