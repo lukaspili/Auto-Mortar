@@ -1,16 +1,16 @@
 package mvp.sample.app;
 
 import android.app.Application;
-import android.content.Context;
 
-import javax.inject.Singleton;
-
-import dagger.Provides;
+import autodagger.AutoComponent;
+import autodagger.AutoInjector;
 import mortar.MortarScope;
 import mvp.sample.BuildConfig;
-import mvp.sample.rest.RestClient;
 import timber.log.Timber;
 
+@AutoComponent
+@AutoInjector
+@DaggerScope(App.class)
 public class App extends Application {
 
     private MortarScope mortarScope;
@@ -28,33 +28,12 @@ public class App extends Application {
             Timber.plant(new Timber.DebugTree());
         }
 
-        Component component = DaggerApp_Component.builder()
-                .module(new Module())
+        AppComponent component = DaggerAppComponent.builder()
                 .build();
         component.inject(this);
 
         mortarScope = MortarScope.buildRootScope()
                 .withService(DaggerService.SERVICE_NAME, component)
                 .build("Root");
-    }
-
-
-    @dagger.Component(modules = Module.class)
-    @Singleton
-    public interface Component {
-
-        RestClient restClient();
-
-        void inject(App app);
-    }
-
-    @dagger.Module
-    public class Module {
-
-        @Provides
-        @Singleton
-        Context provideApplicationContext() {
-            return getApplicationContext();
-        }
     }
 }

@@ -2,18 +2,20 @@ package mvp.sample.app.presenter;
 
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import autodagger.AutoComponent;
+import autodagger.AutoExpose;
 import flow.Flow;
 import flownavigation.common.flow.Layout;
 import mortar.ViewPresenter;
-import mvp.MVP;
+import mvp.AutoScreen;
 import mvp.sample.R;
+import mvp.sample.app.DaggerScope;
 import mvp.sample.app.adapter.PostAdapter;
 import mvp.sample.model.Post;
 import mvp.sample.rest.RestClient;
@@ -27,11 +29,12 @@ import timber.log.Timber;
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
-@MVP(
-        parent = RootActivity.Component.class,
-        baseViewLayout = FrameLayout.class,
+@AutoScreen(
+        component = @AutoComponent(dependencies = RootActivity.class),
         screenAnnotations = Layout.class
 )
+@AutoExpose()
+@DaggerScope(PostsPresenter.class)
 @Layout(R.layout.screen_posts)
 public class PostsPresenter extends ViewPresenter<PostsView> implements PostAdapter.Listener {
 
@@ -40,7 +43,6 @@ public class PostsPresenter extends ViewPresenter<PostsView> implements PostAdap
     private PostAdapter adapter;
     private List<Post> posts = new ArrayList<>();
 
-    @Inject
     public PostsPresenter(RestClient restClient) {
         this.restClient = restClient;
     }
@@ -92,6 +94,6 @@ public class PostsPresenter extends ViewPresenter<PostsView> implements PostAdap
         if (!hasView()) return;
 
         Post post = posts.get(position);
-        Flow.get(getView()).set(new MVP_ViewPostScreen(post));
+        Flow.get(getView()).set(new ViewPostScreen(post));
     }
 }

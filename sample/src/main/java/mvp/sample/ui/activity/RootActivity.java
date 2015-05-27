@@ -7,6 +7,8 @@ import android.view.MenuItem;
 
 import com.google.gson.Gson;
 
+import autodagger.AutoComponent;
+import autodagger.AutoInjector;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import flow.Flow;
@@ -19,14 +21,18 @@ import flownavigation.path.PathContainerView;
 import mortar.MortarScope;
 import mortar.bundler.BundleServiceRunner;
 import mvp.sample.R;
-import mvp.sample.app.ActivityScope;
 import mvp.sample.app.App;
+import mvp.sample.app.AppComponent;
+import mvp.sample.app.DaggerScope;
 import mvp.sample.app.DaggerService;
-import mvp.sample.app.presenter.MVP_PostsScreen;
+import mvp.sample.app.presenter.PostsScreen;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
+@AutoComponent(dependencies = App.class)
+@AutoInjector
+@DaggerScope(RootActivity.class)
 public class RootActivity extends Activity implements Flow.Dispatcher {
 
     MortarScope mortarScope;
@@ -58,8 +64,8 @@ public class RootActivity extends Activity implements Flow.Dispatcher {
         mortarScope = MortarScope.findChild(getApplicationContext(), getClass().getName());
 
         if (mortarScope == null) {
-            Component component = DaggerRootActivity_Component.builder()
-                    .component(DaggerService.<App.Component>getDaggerComponent(getApplicationContext()))
+            RootActivityComponent component = DaggerRootActivityComponent.builder()
+                    .appComponent(DaggerService.<AppComponent>getDaggerComponent(getApplicationContext()))
                     .build();
 
             mortarScope = MortarScope.buildChild(getApplicationContext())
@@ -68,7 +74,7 @@ public class RootActivity extends Activity implements Flow.Dispatcher {
                     .build(getClass().getName());
         }
 
-        DaggerService.<Component>getDaggerComponent(this).inject(this);
+        DaggerService.<RootActivityComponent>getDaggerComponent(this).inject(this);
 
         BundleServiceRunner.getBundleServiceRunner(this).onCreate(savedInstanceState);
 
@@ -78,7 +84,7 @@ public class RootActivity extends Activity implements Flow.Dispatcher {
         GsonParceler parceler = new GsonParceler(new Gson());
         @SuppressWarnings("deprecation") FlowDelegate.NonConfigurationInstance nonConfig =
                 (FlowDelegate.NonConfigurationInstance) getLastNonConfigurationInstance();
-        flowDelegate = FlowDelegate.onCreate(nonConfig, getIntent(), savedInstanceState, parceler, History.single(new MVP_PostsScreen()), this);
+        flowDelegate = FlowDelegate.onCreate(nonConfig, getIntent(), savedInstanceState, parceler, History.single(new PostsScreen()), this);
     }
 
     @Override
@@ -154,12 +160,5 @@ public class RootActivity extends Activity implements Flow.Dispatcher {
                 callback.onTraversalCompleted();
             }
         });
-    }
-
-    @dagger.Component(dependencies = App.Component.class)
-    @ActivityScope
-    public interface Component extends App.Component {
-
-        void inject(RootActivity activity);
     }
 }

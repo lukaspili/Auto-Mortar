@@ -5,6 +5,7 @@ import com.squareup.javapoet.TypeName;
 
 import java.util.List;
 
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 
 import mvp.compiler.model.InjectableVariableElement;
@@ -15,76 +16,23 @@ import mvp.compiler.model.InjectableVariableElement;
 public class ScreenSpec extends AbstractSpec {
 
     private final Element element;
-    private TypeName superclassTypeName;
-    private ClassName layoutAnnotationClassName;
-    private BaseViewSpec baseViewSpec;
-    private TypeName viewTypeName;
-    private ModuleSpec moduleSpec;
-    private ComponentSpec componentSpec;
-    private ClassName daggerComponentTypeName;
     private TypeName presenterTypeName;
-    private List<InjectableVariableElement> screenParamMembers;
+    private TypeName superclassTypeName;
+    private ClassName componentClassName;
+    private ModuleSpec moduleSpec;
+    private AnnotationMirror scopeAnnotationMirror; // javapoet handles now AnnotationMirror types
+    private List<InjectableVariableElement> constructorParameters;
     private List<ScreenAnnotationSpec> annotationSpecs;
+    private List<AutoComponentMemberSpec> componentDependenciesSpecs;
+    private List<AutoComponentMemberSpec> componentModulesSpecs;
 
     public ScreenSpec(ClassName className, Element element) {
         super(className);
         this.element = element;
     }
 
-    public TypeName getSuperclassTypeName() {
-        return superclassTypeName;
-    }
-
-    public void setSuperclassTypeName(TypeName superclassTypeName) {
-        this.superclassTypeName = superclassTypeName;
-    }
-
-    public ClassName getLayoutAnnotationClassName() {
-        return layoutAnnotationClassName;
-    }
-
-    public void setLayoutAnnotationClassName(ClassName layoutAnnotationClassName) {
-        this.layoutAnnotationClassName = layoutAnnotationClassName;
-    }
-
-    public BaseViewSpec getBaseViewSpec() {
-        return baseViewSpec;
-    }
-
-    public void setBaseViewSpec(BaseViewSpec baseViewSpec) {
-        this.baseViewSpec = baseViewSpec;
-    }
-
-    public TypeName getViewTypeName() {
-        return viewTypeName;
-    }
-
-    public void setViewTypeName(TypeName viewTypeName) {
-        this.viewTypeName = viewTypeName;
-    }
-
-    public ModuleSpec getModuleSpec() {
-        return moduleSpec;
-    }
-
-    public void setModuleSpec(ModuleSpec moduleSpec) {
-        this.moduleSpec = moduleSpec;
-    }
-
-    public ComponentSpec getComponentSpec() {
-        return componentSpec;
-    }
-
-    public void setComponentSpec(ComponentSpec componentSpec) {
-        this.componentSpec = componentSpec;
-    }
-
-    public ClassName getDaggerComponentTypeName() {
-        return daggerComponentTypeName;
-    }
-
-    public void setDaggerComponentTypeName(ClassName daggerComponentTypeName) {
-        this.daggerComponentTypeName = daggerComponentTypeName;
+    public Element getElement() {
+        return element;
     }
 
     public TypeName getPresenterTypeName() {
@@ -95,16 +43,44 @@ public class ScreenSpec extends AbstractSpec {
         this.presenterTypeName = presenterTypeName;
     }
 
-    public List<InjectableVariableElement> getScreenParamMembers() {
-        return screenParamMembers;
+    public TypeName getSuperclassTypeName() {
+        return superclassTypeName;
     }
 
-    public void setScreenParamMembers(List<InjectableVariableElement> screenParamMembers) {
-        this.screenParamMembers = screenParamMembers;
+    public void setSuperclassTypeName(TypeName superclassTypeName) {
+        this.superclassTypeName = superclassTypeName;
     }
 
-    public Element getElement() {
-        return element;
+    public ClassName getComponentClassName() {
+        return componentClassName;
+    }
+
+    public void setComponentClassName(ClassName componentClassName) {
+        this.componentClassName = componentClassName;
+    }
+
+    public ModuleSpec getModuleSpec() {
+        return moduleSpec;
+    }
+
+    public void setModuleSpec(ModuleSpec moduleSpec) {
+        this.moduleSpec = moduleSpec;
+    }
+
+    public AnnotationMirror getScopeAnnotationMirror() {
+        return scopeAnnotationMirror;
+    }
+
+    public void setScopeAnnotationMirror(AnnotationMirror scopeAnnotationMirror) {
+        this.scopeAnnotationMirror = scopeAnnotationMirror;
+    }
+
+    public List<InjectableVariableElement> getConstructorParameters() {
+        return constructorParameters;
+    }
+
+    public void setConstructorParameters(List<InjectableVariableElement> constructorParameters) {
+        this.constructorParameters = constructorParameters;
     }
 
     public List<ScreenAnnotationSpec> getAnnotationSpecs() {
@@ -113,5 +89,21 @@ public class ScreenSpec extends AbstractSpec {
 
     public void setAnnotationSpecs(List<ScreenAnnotationSpec> annotationSpecs) {
         this.annotationSpecs = annotationSpecs;
+    }
+
+    public List<AutoComponentMemberSpec> getComponentDependenciesSpecs() {
+        return componentDependenciesSpecs;
+    }
+
+    public void setComponentDependenciesSpecs(List<AutoComponentMemberSpec> componentDependenciesSpecs) {
+        this.componentDependenciesSpecs = componentDependenciesSpecs;
+    }
+
+    public List<AutoComponentMemberSpec> getComponentModulesSpecs() {
+        return componentModulesSpecs;
+    }
+
+    public void setComponentModulesSpecs(List<AutoComponentMemberSpec> componentModulesSpecs) {
+        this.componentModulesSpecs = componentModulesSpecs;
     }
 }

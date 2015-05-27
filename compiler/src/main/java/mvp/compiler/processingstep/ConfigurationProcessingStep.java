@@ -1,9 +1,5 @@
 package mvp.compiler.processingstep;
 
-import com.google.auto.common.BasicAnnotationProcessor;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.SetMultimap;
-
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
@@ -18,7 +14,7 @@ import mvp.config.MvpConfiguration;
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
-public class ConfigurationProcessingStep implements BasicAnnotationProcessor.ProcessingStep {
+public class ConfigurationProcessingStep implements ProcessingStep {
 
     private final MessageDelivery messageDelivery;
     private final ProcessingStepsBus processingStepsBus;
@@ -29,24 +25,21 @@ public class ConfigurationProcessingStep implements BasicAnnotationProcessor.Pro
     }
 
     @Override
-    public Set<? extends Class<? extends Annotation>> annotations() {
-        return ImmutableSet.<Class<? extends Annotation>>of(MvpConfiguration.class);
+    public Class<? extends Annotation> annotation() {
+        return MvpConfiguration.class;
     }
 
     @Override
-    public void process(SetMultimap<Class<? extends Annotation>, Element> elementsByAnnotation) {
+    public void process(Set<? extends Element> elements) {
         ConfigurationExtractor configurationExtractor = null;
 
-        for (Class<? extends Annotation> annotation : elementsByAnnotation.keySet()) {
-            Set<Element> elements = elementsByAnnotation.get(annotation);
-            for (Element element : elements) {
-                if (configurationExtractor != null) {
-                    messageDelivery.add(Message.error(element, "Cannot have more than one @Config for Mortar-MVP"));
-                    break;
-                }
-
-                configurationExtractor = new ConfigurationExtractor(element);
+        for (Element element : elements) {
+            if (configurationExtractor != null) {
+                messageDelivery.add(Message.error(element, "Multiple configurations are forbidden"));
+                break;
             }
+
+            configurationExtractor = new ConfigurationExtractor(element);
         }
 
         if (configurationExtractor != null) {

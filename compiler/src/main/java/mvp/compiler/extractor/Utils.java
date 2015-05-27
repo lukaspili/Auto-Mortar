@@ -12,7 +12,6 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
@@ -32,14 +31,18 @@ final class Utils {
         return null;
     }
 
+    public static <T> T getValueFromAnnotation(AnnotationMirror annotationMirror, Class<? extends Annotation> annotation, String name) {
+        AnnotationValue annotationValue = getAnnotationValue(annotationMirror, name);
+        return annotationValue != null ? (T) annotationValue.getValue() : null;
+    }
+
     public static <T> T getValueFromAnnotation(Element element, Class<? extends Annotation> annotation, String name) {
         Optional<AnnotationMirror> annotationMirror = MoreElements.getAnnotationMirror(element, annotation);
         if (!annotationMirror.isPresent()) {
             return null;
         }
 
-        AnnotationValue annotationValue = getAnnotationValue(annotationMirror.get(), name);
-        return annotationValue != null ? (T) annotationValue.getValue() : null;
+        return getValueFromAnnotation(annotationMirror.get(), annotation, name);
     }
 
     public static Optional<DeclaredType> getSuperclassDeclaredType(Types types, Elements elements, Element element) {

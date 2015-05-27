@@ -16,13 +16,6 @@ public class ConfigurationExtractor {
     private final TypeMirror screenSuperclassTypeMirror;
     private final String daggerServiceName;
 
-//    public ConfigurationExtractor() throws Exception {
-//        System.out.println("NEW");
-//        butterknife = (boolean) MvpConfiguration.class.getMethod(CONFIG_BUTTERKNIFE).getDefaultValue();
-//        screenSuperclassTypeMirror = (Class) MvpConfiguration.class.getMethod(CONFIG_BUTTERKNIFE).getDefaultValue();
-//        daggerServiceName = (String) MvpConfiguration.class.getMethod(CONFIG_BUTTERKNIFE).getDefaultValue();
-//    }
-
     public ConfigurationExtractor(Element element) {
         MvpConfiguration mvpConfiguration = element.getAnnotation(MvpConfiguration.class);
         butterknife = mvpConfiguration.butterknife();
