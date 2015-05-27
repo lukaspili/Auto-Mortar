@@ -10,12 +10,12 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
-public @interface MvpConfiguration {
+public @interface AutoMortarConfig {
 
     boolean butterknife() default true;
 
     Class<?> screenSuperclass() default void.class;
 
-    String daggerServiceName() default DefaultMvpConfiguration.DAGGER_SERVICE_NAME;
+    String daggerServiceName() default DefaultAutoMortarConfig.DAGGER_SERVICE_NAME;
 
 }

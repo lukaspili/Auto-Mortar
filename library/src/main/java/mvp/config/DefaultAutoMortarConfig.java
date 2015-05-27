@@ -7,9 +7,9 @@ import java.lang.annotation.Annotation;
  *
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
-public class DefaultMvpConfiguration implements MvpConfiguration {
+public class DefaultAutoMortarConfig implements AutoMortarConfig {
 
-    public static final String DAGGER_SERVICE_NAME = "mvp.DaggerService";
+    public static final String DAGGER_SERVICE_NAME = "automortar.DaggerService";
 
     @Override
     public boolean butterknife() {
@@ -28,6 +28,6 @@ public class DefaultMvpConfiguration implements MvpConfiguration {
 
     @Override
     public Class<? extends Annotation> annotationType() {
-        return DefaultMvpConfiguration.class;
+        return DefaultAutoMortarConfig.class;
     }
 }

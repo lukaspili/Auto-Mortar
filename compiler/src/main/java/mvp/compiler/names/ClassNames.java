@@ -16,7 +16,7 @@ public class ClassNames {
     public static final String SCREEN_NAME = "Screen";
     public static final String PRESENTER_NAME = "Presenter";
     public static final String MODULE_NAME = "Module";
-    public static final String CONFIG_NAME = "AutoMortar_Config";
+    public static final String CONFIG_NAME = "AutoMortarConfig";
     public static final String COMPONENT_NAME = "Component";
 
     public static ClassName context() {
@@ -24,7 +24,7 @@ public class ClassNames {
     }
 
     public static final ClassName mvpConfig() {
-        return ClassName.get("generatedmvp", CONFIG_NAME);
+        return ClassName.get("automortarconfig", CONFIG_NAME);
     }
 
     public static String componentName(String name) {

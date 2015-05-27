@@ -1,12 +1,12 @@
 package mvp.sample.app;
 
 import flownavigation.path.Path;
-import mvp.config.MvpConfiguration;
+import mvp.config.AutoMortarConfig;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
-@MvpConfiguration(
+@AutoMortarConfig(
         screenSuperclass = Path.class
 )
 interface MvpConfig {

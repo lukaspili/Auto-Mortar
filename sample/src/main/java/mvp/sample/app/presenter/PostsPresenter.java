@@ -33,7 +33,6 @@ import timber.log.Timber;
         component = @AutoComponent(dependencies = RootActivity.class),
         screenAnnotations = Layout.class
 )
-@AutoExpose()
 @DaggerScope(PostsPresenter.class)
 @Layout(R.layout.screen_posts)
 public class PostsPresenter extends ViewPresenter<PostsView> implements PostAdapter.Listener {

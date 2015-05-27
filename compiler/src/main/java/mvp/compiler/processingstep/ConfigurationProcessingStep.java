@@ -9,7 +9,7 @@ import mvp.compiler.extractor.ConfigurationExtractor;
 import mvp.compiler.message.Message;
 import mvp.compiler.message.MessageDelivery;
 import mvp.compiler.model.Configuration;
-import mvp.config.MvpConfiguration;
+import mvp.config.AutoMortarConfig;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
@@ -26,7 +26,7 @@ public class ConfigurationProcessingStep implements ProcessingStep {
 
     @Override
     public Class<? extends Annotation> annotation() {
-        return MvpConfiguration.class;
+        return AutoMortarConfig.class;
     }
 
     @Override
