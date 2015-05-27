@@ -160,16 +160,17 @@ public class ScreenProcessingStep implements ProcessingStep {
             screenSpec.setAnnotationSpecs(annotationSpecs);
         }
 
+        // presenter constructor params
         List<InjectableVariableElement> injectableParams = buildInjectableParams(screenExtractor);
-        Preconditions.checkNotNull(injectableParams);
 
+        // presenter constructor params provided by screen constructor
         List<InjectableVariableElement> screenParamsMembers = Lists.newArrayList(Collections2.filter(injectableParams, new Predicate<InjectableVariableElement>() {
             @Override
             public boolean apply(InjectableVariableElement input) {
                 return input.isScreenParam();
             }
         }));
-        screenSpec.setScreenParamMembers(screenParamsMembers);
+        screenSpec.setConstructorParameters(screenParamsMembers);
 
         // module
         ModuleSpec moduleSpec = buildModule(screenExtractor, screenSpec, classNames, injectableParams);
@@ -260,7 +261,7 @@ public class ScreenProcessingStep implements ProcessingStep {
                 return !input.isScreenParam();
             }
         }));
-        moduleSpec.setProvidePresenterParams(injectableParams);
+        moduleSpec.setProvidePresenterParams(methodParams);
 
         return moduleSpec;
     }

@@ -21,7 +21,7 @@ public class ScreenSpec extends AbstractSpec {
     private ClassName componentClassName;
     private ModuleSpec moduleSpec;
     private AnnotationMirror scopeAnnotationMirror; // javapoet handles now AnnotationMirror types
-    private List<InjectableVariableElement> screenParamMembers;
+    private List<InjectableVariableElement> constructorParameters;
     private List<ScreenAnnotationSpec> annotationSpecs;
     private List<AutoComponentMemberSpec> componentDependenciesSpecs;
     private List<AutoComponentMemberSpec> componentModulesSpecs;
@@ -75,12 +75,12 @@ public class ScreenSpec extends AbstractSpec {
         this.scopeAnnotationMirror = scopeAnnotationMirror;
     }
 
-    public List<InjectableVariableElement> getScreenParamMembers() {
-        return screenParamMembers;
+    public List<InjectableVariableElement> getConstructorParameters() {
+        return constructorParameters;
     }
 
-    public void setScreenParamMembers(List<InjectableVariableElement> screenParamMembers) {
-        this.screenParamMembers = screenParamMembers;
+    public void setConstructorParameters(List<InjectableVariableElement> constructorParameters) {
+        this.constructorParameters = constructorParameters;
     }
 
     public List<ScreenAnnotationSpec> getAnnotationSpecs() {

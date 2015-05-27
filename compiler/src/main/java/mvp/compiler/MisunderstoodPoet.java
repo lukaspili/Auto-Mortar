@@ -38,13 +38,13 @@ public class MisunderstoodPoet {
 
     public TypeSpec compose(ScreenSpec screenSpec) {
         TypeSpec.Builder screenTypeSpecBuilder = createScreenBuilder(screenSpec);
-        screenTypeSpecBuilder.addType(composeModule(screenSpec.getModuleSpec()));
+        screenTypeSpecBuilder.addType(buildModule(screenSpec.getModuleSpec()));
 
         // and compose!
         return screenTypeSpecBuilder.build();
     }
 
-    public TypeSpec composeModule(ModuleSpec moduleSpec) {
+    public TypeSpec buildModule(ModuleSpec moduleSpec) {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("providePresenter")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(moduleSpec.getPresenterClassName())
@@ -124,7 +124,7 @@ public class MisunderstoodPoet {
         }
 
         List<VariableElement> constructorParameters = new ArrayList<>();
-        for (InjectableVariableElement injectableVariableElement : screenSpec.getScreenParamMembers()) {
+        for (InjectableVariableElement injectableVariableElement : screenSpec.getConstructorParameters()) {
             builder.addField(FieldSpec.builder(TypeName.get(injectableVariableElement.getElement().asType()), injectableVariableElement.getElement().getSimpleName().toString())
                     .addModifiers(Modifier.PRIVATE)
                     .build());

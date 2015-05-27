@@ -29,9 +29,9 @@ public class ViewPostPresenter extends ViewPresenter<ViewPostView> {
 
     private Post post;
 
-//    public ViewPostPresenter(@ScreenParam Post post) {
-//        this.post = post;
-//    }
+    public ViewPostPresenter(@ScreenParam Post post) {
+        this.post = post;
+    }
 
     @Override
     protected void onLoad(Bundle savedInstanceState) {
