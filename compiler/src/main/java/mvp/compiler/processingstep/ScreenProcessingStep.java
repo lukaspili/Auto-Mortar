@@ -134,6 +134,10 @@ public class ScreenProcessingStep implements BasicAnnotationProcessor.Processing
 
         ScreenSpec screenSpec = new ScreenSpec(classNames.getScreenClassName(), screenExtractor.getElement());
 
+        // screen presenter
+        // which is the class on which the @AutoScreen annotation is applied
+        screenSpec.setPresenterTypeName(TypeName.get(screenExtractor.getElement().asType()));
+
         // screen superclass
         screenSpec.setSuperclassTypeName(configuration.getScreenSuperclassTypeName());
 
@@ -176,7 +180,7 @@ public class ScreenProcessingStep implements BasicAnnotationProcessor.Processing
     }
 
     /**
-     * dependencies true for if dependencies, otherwise false for modules
+     * @param dependencies true for dependencies, false for modules
      */
     private List<AutoComponentMemberSpec> buildComponentTypeNames(ClassNames classNames, List<TypeMirror> typeMirrors, boolean dependencies) {
         List<AutoComponentMemberSpec> memberSpecs = new ArrayList<>();
@@ -206,11 +210,6 @@ public class ScreenProcessingStep implements BasicAnnotationProcessor.Processing
                 name = StringUtils.uncapitalize(element.getSimpleName().toString());
                 realTypeName = typeName;
             }
-
-            System.out.println("E " + element.getSimpleName());
-            System.out.println("N " + name);
-            System.out.println("T " + realTypeName);
-
 
             memberSpecs.add(new AutoComponentMemberSpec(typeName, realTypeName, name));
         }

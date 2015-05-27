@@ -15,7 +15,7 @@ import javax.annotation.Generated;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 
-import autodagger.autodagger.AutoComponent;
+import autodagger.AutoComponent;
 import dagger.Module;
 import dagger.Provides;
 import mvp.ScreenComponentFactory;
@@ -37,13 +37,8 @@ public class MisunderstoodPoet {
     private final static String CONFIG_DAGGERSERVICENAME = "DAGGER_SERVICE_NAME";
 
     public TypeSpec compose(ScreenSpec screenSpec) {
-        System.out.println("YO COMPOSE");
         TypeSpec.Builder screenTypeSpecBuilder = createScreenBuilder(screenSpec);
-        System.out.println("SCREEN DONE");
         screenTypeSpecBuilder.addType(composeModule(screenSpec.getModuleSpec()));
-        System.out.println("MODULE DONE");
-
-        System.out.println("DONE COMPOSE");
 
         // and compose!
         return screenTypeSpecBuilder.build();
@@ -96,8 +91,6 @@ public class MisunderstoodPoet {
                 .returns(screenSpec.getComponentClassName())
                 .addStatement("return ($T) $L.getSystemService($T.$L)", screenSpec.getComponentClassName(), "context", ClassNames.mvpConfig(), CONFIG_DAGGERSERVICENAME)
                 .build();
-
-        System.out.println("YO 1");
 
         // createComponent()
         MethodSpec createComponentMethod = buildScreenCreateComponentMethodSpec(screenSpec);
@@ -197,11 +190,13 @@ public class MisunderstoodPoet {
     }
 
     private AnnotationSpec buildAutoComponentAnnotationSpec(ScreenSpec screenSpec) {
-        // modules are never empty
+        // target is the presenter
+        // modules are never empty (at least the screen module)
         AnnotationSpec.Builder builder = AnnotationSpec.builder(AutoComponent.class)
+                .addMember("target", "$T.class", screenSpec.getPresenterTypeName())
                 .addMember("modules", PoetUtils.getStringOfClassArrayTypes(screenSpec.getComponentModulesSpecs().size()), SpecUtils.getTypeNames(screenSpec.getComponentModulesSpecs()));
 
-        // dependencies
+        // dependencies if not empty
         if (!screenSpec.getComponentDependenciesSpecs().isEmpty()) {
             builder.addMember("dependencies", PoetUtils.getStringOfClassArrayTypes(screenSpec.getComponentDependenciesSpecs().size()), SpecUtils.getTypeNames(screenSpec.getComponentDependenciesSpecs()));
         }

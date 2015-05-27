@@ -7,8 +7,8 @@ import android.view.MenuItem;
 
 import com.google.gson.Gson;
 
-import autodagger.autodagger.AutoComponent;
-import autodagger.autodagger.AutoInjector;
+import autodagger.AutoComponent;
+import autodagger.AutoInjector;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import flow.Flow;

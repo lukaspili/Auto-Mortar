@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import javax.inject.Inject;
 
-import autodagger.autodagger.AutoComponent;
+import autodagger.AutoComponent;
 import flownavigation.common.flow.Layout;
 import mortar.ViewPresenter;
 import mvp.AutoScreen;

@@ -6,7 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import autodagger.autodagger.AutoComponent;
+import autodagger.AutoComponent;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>

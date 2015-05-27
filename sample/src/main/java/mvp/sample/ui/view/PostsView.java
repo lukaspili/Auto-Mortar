@@ -7,7 +7,7 @@ import android.widget.FrameLayout;
 
 import javax.inject.Inject;
 
-import autodagger.autodagger.AutoInjector;
+import autodagger.AutoInjector;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import mvp.sample.R;

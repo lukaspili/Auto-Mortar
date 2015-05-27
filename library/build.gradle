@@ -19,7 +19,7 @@ configurations.all {
 
 dependencies {
     compile deps.mortar
-    compile group: 'com.github.lukaspili', name: 'autodagger', version: '0.1-SNAPSHOT', changing: true
+    compile group: 'com.github.lukaspili', name: 'autodagger', version: '0.2-SNAPSHOT', changing: true
 
     provided 'javax.inject:javax.inject:1'
     provided deps.android

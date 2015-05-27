@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 
 import javax.inject.Inject;
 
-import autodagger.autodagger.AutoExpose;
+import autodagger.AutoExpose;
 import mvp.sample.app.App;
 import mvp.sample.app.DaggerScope;
 import retrofit.RestAdapter;

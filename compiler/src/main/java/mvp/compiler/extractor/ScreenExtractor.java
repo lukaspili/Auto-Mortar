@@ -14,7 +14,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import autodagger.autodagger.AutoComponent;
+import autodagger.AutoComponent;
 import mvp.AutoScreen;
 import mvp.compiler.message.Message;
 

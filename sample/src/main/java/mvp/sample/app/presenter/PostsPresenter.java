@@ -8,7 +8,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import autodagger.autodagger.AutoComponent;
+import autodagger.AutoComponent;
 import flow.Flow;
 import flownavigation.common.flow.Layout;
 import mortar.ViewPresenter;

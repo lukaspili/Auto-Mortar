@@ -2,8 +2,8 @@ package mvp.sample.app;
 
 import android.app.Application;
 
-import autodagger.autodagger.AutoComponent;
-import autodagger.autodagger.AutoInjector;
+import autodagger.AutoComponent;
+import autodagger.AutoInjector;
 import mortar.MortarScope;
 import mvp.sample.BuildConfig;
 import timber.log.Timber;

@@ -16,6 +16,7 @@ import mvp.compiler.model.InjectableVariableElement;
 public class ScreenSpec extends AbstractSpec {
 
     private final Element element;
+    private TypeName presenterTypeName;
     private TypeName superclassTypeName;
     private ClassName componentClassName;
     private ModuleSpec moduleSpec;
@@ -32,6 +33,14 @@ public class ScreenSpec extends AbstractSpec {
 
     public Element getElement() {
         return element;
+    }
+
+    public TypeName getPresenterTypeName() {
+        return presenterTypeName;
+    }
+
+    public void setPresenterTypeName(TypeName presenterTypeName) {
+        this.presenterTypeName = presenterTypeName;
     }
 
     public TypeName getSuperclassTypeName() {
