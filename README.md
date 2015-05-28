@@ -250,6 +250,7 @@ public final class ViewPostScreen implements ComponentFactory {
 ## Installation
 
 Gradle apt plugin recommended, like for dagger 2.
+You would also need Auto Dagger2 dependency.
 
 ```groovy
 buildscript {
@@ -271,15 +272,18 @@ repositories {
 }
 
 dependencies {
-    apt 'com.github.lukaspili:mortar-mvp-compiler:0.4-SNAPSHOT'
-    compile 'com.github.lukaspili:mortar-mvp:0.4-SNAPSHOT'
+    apt 'com.github.lukaspili:automortar-compiler:1.0'
+    compile 'com.github.lukaspili:automortar:1.0'
+    
+    apt 'com.github.lukaspili:autodagger2-compiler:0.1-SNAPSHOT'
+    compile 'com.github.lukaspili:autodagger2:0.1-SNAPSHOT'
 }
 ```
 
 
 ## Status
 
-Experimental library.
+Stable API.
 
 
 ## Author
@@ -289,6 +293,6 @@ Experimental library.
 
 ## License
 
-Mortar MVP is released under the MIT license. See the LICENSE file for more info.
+Mortar MVP is released under the MIT license. See the LICENSE file for details.
 
 
