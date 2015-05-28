@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mvp.sample.ui.view.ViewPostView xmlns:android="http://schemas.android.com/apk/res/android"
+<automortar.sample.ui.view.ViewPostView xmlns:android="http://schemas.android.com/apk/res/android"
                                            android:orientation="vertical"
                                            android:layout_width="match_parent"
                                            android:layout_height="match_parent"
@@ -16,9 +16,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <mvp.sample.ui.view.BannerView
+    <automortar.sample.ui.view.BannerView
         android:layout_width="match_parent"
         android:layout_height="30dp"
         />
 
-</mvp.sample.ui.view.ViewPostView>
+</automortar.sample.ui.view.ViewPostView>
