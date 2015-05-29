@@ -17,10 +17,20 @@ public class ShowUserScreen extends Path {
     public ShowUserScreen(String username) {
         this.username = username;
     }
+    
+    // We also need a method that creates the dagger2 component
+    // either by reflection or by some method like the following
+    public Component createComponent(RootActivity.Component parent) {
+	    return DaggerShowUserScreen.Component.builder()
+	    	.component(parent)
+	    	.module(new Module())
+	    	.build();
+    }
+
 
     @dagger.Component(dependencies = RootActivity.Component.class, modules = Module.class)
     @DaggerScope(ShowUserPresenter.class)
-    public interface Component extends RootActivity.Component {
+    public interface Component extends AppDependencies {
         void inject(ShowUserView view);
     }
 
@@ -55,7 +65,7 @@ public class ShowUserScreen extends Path {
 // ShowUserPresenter.java
 
 @AutoScreen(
-        component = @AutoComponent(dependencies = RootActivity.class),
+        component = @AutoComponent(dependencies = RootActivity.class, superinterfaces = AppDependencies.class),
         screenAnnotations = Layout.class
 )
 @DaggerScope(ShowUserPresenter.class)
@@ -161,7 +171,7 @@ Create a new empty interface (or class), and annotate it with `@AutoMortarConfig
 @AutoMortarConfig(
 	screenSuperclass = Path.class // all generated screens will extend from Path
 )
-interface MvpConfig { }
+interface Config { }
 ```
 
 If you don't provide a configuration, the default will be used (see `automortar.config.DefaultAutoMortarConfig`). Only one configuration per project is supported.
@@ -189,19 +199,19 @@ public class ShowUserPresenter extends ViewPresenter<ShowUserView> {
 That's all! `@AutoScreen` will generate the following screen and module for you.
 
 ```java
-public final class MVP_ShowUserScreen {
+public final class ShowUserScreen {
   private String username;
 
-  public MVP_ShowUserScreen(String username) {
+  public ShowUserScreen(String username) {
     this.username = username;
   }
 
   @dagger.Module
   public class Module {
     @Provides
-    @ScreenScope(ViewPostPresenter.class)
+    @ScreenScope(ShowUserPresenter.class)
     public ShowUserPresenter providePresenter(RestClient restClient) {
-      return new ViewPostPresenter(username, restClient);
+      return new ShowUserPresenter(username, restClient);
     }
   }
 
@@ -236,7 +246,7 @@ The generated screen provides also a helper static get method that retreives the
 ```java
 public final class ViewPostScreen implements ComponentFactory {
 
-  public static Component getComponent(Context context) {
+  public static ViewPostScreenComponent getComponent(Context context) {
     return (ViewPostScreenComponent) context.getSystemService(AutoMortarConfig.DAGGER_SERVICE_NAME);
   }
 ```
@@ -244,7 +254,10 @@ public final class ViewPostScreen implements ComponentFactory {
 
 ### Dagger scope
 
+In the same way as Auto Dagger2 works, you need to annotate your presenter with a dagger scope annotation (an annotation that is itself annotated with `@Scope`).
+Auto mortar will detect this annotation, and will apply it on the generated module and component.
 
+If you don't provide scope annotation on the presenter, the generated module and component will be unscoped.
 
 
 ## Installation
@@ -272,11 +285,11 @@ repositories {
 }
 
 dependencies {
-    apt 'com.github.lukaspili:automortar-compiler:1.0'
-    compile 'com.github.lukaspili:automortar:1.0'
+    apt 'com.github.lukaspili:automortar-compiler:1.0-SNAPSHOT'
+    compile 'com.github.lukaspili:automortar:1.0-SNAPSHOT'
     
-    apt 'com.github.lukaspili:autodagger2-compiler:0.1-SNAPSHOT'
-    compile 'com.github.lukaspili:autodagger2:0.1-SNAPSHOT'
+    apt 'com.github.lukaspili:autodagger2-compiler:0.6-SNAPSHOT'
+    compile 'com.github.lukaspili:autodagger2:0.6-SNAPSHOT'
 }
 ```
 
