@@ -260,6 +260,13 @@ Auto mortar will detect this annotation, and will apply it on the generated modu
 If you don't provide scope annotation on the presenter, the generated module and component will be unscoped.
 
 
+## Demo
+
+Check the sample project for demo.  
+You can also check a full demo project with Auto Mortar here: 
+[https://github.com/lukaspili/Power-Mortar-Flow-Dagger2-demo](https://github.com/lukaspili/Power-Mortar-Flow-Dagger2-demo)
+
+
 ## Installation
 
 Gradle apt plugin recommended, like for dagger 2.
@@ -288,8 +295,8 @@ dependencies {
     apt 'com.github.lukaspili:automortar-compiler:1.0-SNAPSHOT'
     compile 'com.github.lukaspili:automortar:1.0-SNAPSHOT'
     
-    apt 'com.github.lukaspili:autodagger2-compiler:0.6-SNAPSHOT'
-    compile 'com.github.lukaspili:autodagger2:0.6-SNAPSHOT'
+    apt 'com.github.lukaspili:autodagger2-compiler:1.0'
+    compile 'com.github.lukaspili:autodagger2:1.0'
 }
 ```
 
