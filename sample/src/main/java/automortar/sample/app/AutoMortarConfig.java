@@ -1,13 +1,12 @@
 package automortar.sample.app;
 
 import flownavigation.path.Path;
-import automortar.config.AutoMortarConfig;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
-@AutoMortarConfig(
+@automortar.config.AutoMortarConfig(
         screenSuperclass = Path.class
 )
-interface MvpConfig {
+interface AutoMortarConfig {
 }
