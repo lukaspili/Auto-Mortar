@@ -3,11 +3,12 @@ package automortar.sample.app.presenter;
 import android.os.Bundle;
 
 import autodagger.AutoComponent;
+import automortar.sample.R;
 import flownavigation.common.flow.Layout;
 import mortar.ViewPresenter;
 import automortar.AutoScreen;
 import automortar.ScreenParam;
-import mvp.sample.R;
+import automortar.sample.R;
 import automortar.sample.app.DaggerScope;
 import automortar.sample.model.Post;
 import automortar.sample.ui.activity.RootActivity;

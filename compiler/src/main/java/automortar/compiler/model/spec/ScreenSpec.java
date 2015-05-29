@@ -22,9 +22,10 @@ public class ScreenSpec extends AbstractSpec {
     private automortar.compiler.model.spec.ModuleSpec moduleSpec;
     private AnnotationMirror scopeAnnotationMirror; // javapoet handles now AnnotationMirror types
     private List<InjectableVariableElement> constructorParameters;
-    private List<automortar.compiler.model.spec.ScreenAnnotationSpec> annotationSpecs;
-    private List<automortar.compiler.model.spec.AutoComponentMemberSpec> componentDependenciesSpecs;
-    private List<automortar.compiler.model.spec.AutoComponentMemberSpec> componentModulesSpecs;
+    private List<ScreenAnnotationSpec> annotationSpecs;
+    private List<AutoComponentMemberSpec> componentDependenciesSpecs;
+    private List<AutoComponentMemberSpec> componentModulesSpecs;
+    private List<AutoComponentMemberSpec> componentSuperinterfacesSpecs;
 
     public ScreenSpec(ClassName className, Element element) {
         super(className);
@@ -105,5 +106,13 @@ public class ScreenSpec extends AbstractSpec {
 
     public void setComponentModulesSpecs(List<automortar.compiler.model.spec.AutoComponentMemberSpec> componentModulesSpecs) {
         this.componentModulesSpecs = componentModulesSpecs;
+    }
+
+    public List<AutoComponentMemberSpec> getComponentSuperinterfacesSpecs() {
+        return componentSuperinterfacesSpecs;
+    }
+
+    public void setComponentSuperinterfacesSpecs(List<AutoComponentMemberSpec> componentSuperinterfacesSpecs) {
+        this.componentSuperinterfacesSpecs = componentSuperinterfacesSpecs;
     }
 }

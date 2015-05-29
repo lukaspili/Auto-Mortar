@@ -7,17 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import autodagger.AutoComponent;
-import flow.Flow;
-import flownavigation.common.flow.Layout;
-import mortar.ViewPresenter;
 import automortar.AutoScreen;
-import mvp.sample.R;
+import automortar.sample.R;
+import automortar.sample.app.AppDependencies;
 import automortar.sample.app.DaggerScope;
 import automortar.sample.app.adapter.PostAdapter;
 import automortar.sample.model.Post;
 import automortar.sample.rest.RestClient;
 import automortar.sample.ui.activity.RootActivity;
 import automortar.sample.ui.view.PostsView;
+import flow.Flow;
+import flownavigation.common.flow.Layout;
+import mortar.ViewPresenter;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -27,7 +28,7 @@ import timber.log.Timber;
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
 @AutoScreen(
-        component = @AutoComponent(dependencies = RootActivity.class),
+        component = @AutoComponent(dependencies = RootActivity.class, superinterfaces = AppDependencies.class),
         screenAnnotations = Layout.class
 )
 @DaggerScope(PostsPresenter.class)

@@ -4,11 +4,11 @@ import android.app.Application;
 
 import autodagger.AutoComponent;
 import autodagger.AutoInjector;
+import automortar.sample.BuildConfig;
 import mortar.MortarScope;
-import mvp.sample.BuildConfig;
 import timber.log.Timber;
 
-@AutoComponent
+@AutoComponent(superinterfaces = AppDependencies.class)
 @AutoInjector
 @DaggerScope(App.class)
 public class App extends Application {

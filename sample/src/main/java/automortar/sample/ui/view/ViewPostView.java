@@ -8,12 +8,12 @@ import android.widget.TextView;
 import javax.inject.Inject;
 
 import autodagger.AutoInjector;
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import mvp.sample.R;
+import automortar.sample.R;
 import automortar.sample.app.DaggerService;
 import automortar.sample.app.presenter.ViewPostPresenter;
 import automortar.sample.app.presenter.ViewPostScreenComponent;
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>

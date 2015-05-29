@@ -293,6 +293,6 @@ Stable API.
 
 ## License
 
-Mortar MVP is released under the MIT license. See the LICENSE file for details.
+Auto Mortar is released under the MIT license. See the LICENSE file for details.
 
 

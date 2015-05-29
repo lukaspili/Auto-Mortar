@@ -25,12 +25,14 @@ public class ScreenExtractor {
     private static final String COMPONENT = "component";
     private static final String COMPONENT_DEPENDENCIES = "dependencies";
     private static final String COMPONENT_MODULES = "modules";
+    private static final String COMPONENT_SUPERINTERFACES = "superinterfaces";
     private static final String SCREEN_ANNOTATIONS = "screenAnnotations";
 
     private final Element element;
     private final AnnotationMirror scopeAnnotationTypeMirror;
     private final List<TypeMirror> componentDependencies;
     private final List<TypeMirror> componentModules;
+    private final List<TypeMirror> componentSuperinterfaces;
     private final List<AnnotationMirror> screenAnnotationsMirrors;
 
     private List<Message> messages = new ArrayList<>();
@@ -42,6 +44,7 @@ public class ScreenExtractor {
         AnnotationMirror autoComponent = Utils.getValueFromAnnotation(element, AutoScreen.class, COMPONENT);
         componentDependencies = findTypeMirrors(autoComponent, COMPONENT_DEPENDENCIES);
         componentModules = findTypeMirrors(autoComponent, COMPONENT_MODULES);
+        componentSuperinterfaces = findTypeMirrors(autoComponent, COMPONENT_SUPERINTERFACES);
 
         screenAnnotationsMirrors = findScreenAnnotations(types);
 
@@ -123,6 +126,10 @@ public class ScreenExtractor {
 
     public List<TypeMirror> getComponentModules() {
         return componentModules;
+    }
+
+    public List<TypeMirror> getComponentSuperinterfaces() {
+        return componentSuperinterfaces;
     }
 
     public List<AnnotationMirror> getScreenAnnotationsMirrors() {

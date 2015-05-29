@@ -202,6 +202,11 @@ public class MisunderstoodPoet {
             builder.addMember("dependencies", PoetUtils.getStringOfClassArrayTypes(screenSpec.getComponentDependenciesSpecs().size()), PoetUtils.getTypeNames(screenSpec.getComponentDependenciesSpecs()));
         }
 
+        // superinterfaces if not empty
+        if (!screenSpec.getComponentSuperinterfacesSpecs().isEmpty()) {
+            builder.addMember("superinterfaces", PoetUtils.getStringOfClassArrayTypes(screenSpec.getComponentSuperinterfacesSpecs().size()), PoetUtils.getTypeNames(screenSpec.getComponentSuperinterfacesSpecs()));
+        }
+
         return builder.build();
     }
 

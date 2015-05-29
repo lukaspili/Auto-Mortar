@@ -7,11 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import mvp.sample.R;
-import automortar.sample.model.Post;
-
 import java.util.List;
 
+import automortar.sample.R;
+import automortar.sample.model.Post;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 

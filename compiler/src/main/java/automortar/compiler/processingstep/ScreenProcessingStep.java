@@ -33,10 +33,9 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import dagger.Component;
+import autodagger.AutoComponent;
 import automortar.AutoScreen;
 import automortar.ScreenParam;
-import automortar.compiler.poet.MisunderstoodPoet;
 import automortar.compiler.extractor.ScreenExtractor;
 import automortar.compiler.message.Message;
 import automortar.compiler.message.MessageDelivery;
@@ -48,6 +47,8 @@ import automortar.compiler.model.spec.ModuleSpec;
 import automortar.compiler.model.spec.ScreenAnnotationSpec;
 import automortar.compiler.model.spec.ScreenSpec;
 import automortar.compiler.names.ClassNames;
+import automortar.compiler.poet.MisunderstoodPoet;
+import dagger.Component;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
@@ -144,10 +145,13 @@ public class ScreenProcessingStep implements ProcessingStep {
         screenSpec.setComponentClassName(classNames.getComponentClassName());
 
         // component dependencies
-        screenSpec.setComponentDependenciesSpecs(buildComponentTypeNames(classNames, screenExtractor.getComponentDependencies(), true));
+        screenSpec.setComponentDependenciesSpecs(buildComponentTypeNames(screenExtractor.getComponentDependencies(), true, false));
+
+        // component superinterfaces
+        screenSpec.setComponentSuperinterfacesSpecs(buildComponentTypeNames(screenExtractor.getComponentSuperinterfaces(), true, true));
 
         // component modules, + add the screen module
-        List<AutoComponentMemberSpec> modulesMemberSpecs = buildComponentTypeNames(classNames, screenExtractor.getComponentModules(), false);
+        List<AutoComponentMemberSpec> modulesMemberSpecs = buildComponentTypeNames(screenExtractor.getComponentModules(), false, false);
         modulesMemberSpecs.add(new AutoComponentMemberSpec(classNames.getModuleClassName(), classNames.getModuleClassName(), StringUtils.uncapitalize(classNames.getModuleClassName().simpleName())));
         screenSpec.setComponentModulesSpecs(modulesMemberSpecs);
 
@@ -177,9 +181,9 @@ public class ScreenProcessingStep implements ProcessingStep {
     }
 
     /**
-     * @param dependencies true for dependencies, false for modules
+     * @param dependencies true for dependencies/superinterfaces, false for modules
      */
-    private List<AutoComponentMemberSpec> buildComponentTypeNames(ClassNames classNames, List<TypeMirror> typeMirrors, boolean dependencies) {
+    private List<AutoComponentMemberSpec> buildComponentTypeNames(List<TypeMirror> typeMirrors, boolean dependencies, boolean superinterfaces) {
         List<AutoComponentMemberSpec> memberSpecs = new ArrayList<>();
         if (typeMirrors == null) {
             return memberSpecs;
@@ -197,11 +201,24 @@ public class ScreenProcessingStep implements ProcessingStep {
                     // manual component, keep the name
                     name = StringUtils.uncapitalize(element.getSimpleName().toString());
                     realTypeName = typeName;
-                } else {
-                    // generated component, add _Component at the end
+                } else if (MoreElements.isAnnotationPresent(element, AutoScreen.class)) {
+                    // component from screen, add "ScreenComponent"
+                    ClassNames classNames = new ClassNames(MoreTypes.asElement(typeMirror));
+                    name = StringUtils.uncapitalize(classNames.getComponentClassName().simpleName());
+                    realTypeName = classNames.getComponentClassName();
+                } else if (MoreElements.isAnnotationPresent(element, AutoComponent.class)) {
+                    // generated component, add "Component" at the end
                     ClassName className = ClassName.get(MoreElements.getPackage(element).toString(), ClassNames.componentName(element.getSimpleName().toString()));
-                    name = StringUtils.uncapitalize(className.simpleName().toString());
+                    name = StringUtils.uncapitalize(className.simpleName());
                     realTypeName = className;
+                } else {
+                    if (superinterfaces) {
+                        // superinterface ignore
+                        name = null;
+                        realTypeName = typeName;
+                    } else {
+                        throw new IllegalStateException("Invalid dependency for " + element.getSimpleName());
+                    }
                 }
             } else {
                 // module

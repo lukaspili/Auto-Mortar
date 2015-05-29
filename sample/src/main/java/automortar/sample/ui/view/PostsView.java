@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import autodagger.AutoInjector;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import mvp.sample.R;
+import automortar.sample.R;
 import automortar.sample.app.DaggerService;
 import automortar.sample.app.presenter.PostsPresenter;
 import automortar.sample.app.presenter.PostsScreenComponent;

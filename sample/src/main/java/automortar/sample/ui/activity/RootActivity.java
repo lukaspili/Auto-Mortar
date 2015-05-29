@@ -9,6 +9,13 @@ import com.google.gson.Gson;
 
 import autodagger.AutoComponent;
 import autodagger.AutoInjector;
+import automortar.sample.R;
+import automortar.sample.app.App;
+import automortar.sample.app.AppComponent;
+import automortar.sample.app.AppDependencies;
+import automortar.sample.app.DaggerScope;
+import automortar.sample.app.DaggerService;
+import automortar.sample.app.presenter.PostsScreen;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import flow.Flow;
@@ -20,17 +27,11 @@ import flownavigation.path.Path;
 import flownavigation.path.PathContainerView;
 import mortar.MortarScope;
 import mortar.bundler.BundleServiceRunner;
-import mvp.sample.R;
-import automortar.sample.app.App;
-import automortar.sample.app.AppComponent;
-import automortar.sample.app.DaggerScope;
-import automortar.sample.app.DaggerService;
-import automortar.sample.app.presenter.PostsScreen;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
  */
-@AutoComponent(dependencies = App.class)
+@AutoComponent(dependencies = App.class, superinterfaces = AppDependencies.class)
 @AutoInjector
 @DaggerScope(RootActivity.class)
 public class RootActivity extends Activity implements Flow.Dispatcher {

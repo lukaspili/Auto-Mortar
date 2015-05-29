@@ -15,7 +15,6 @@ import retrofit.converter.GsonConverter;
  * Created by lukasz on 19/02/15.
  */
 @DaggerScope(App.class)
-@AutoExpose(App.class)
 public class RestClient {
 
     private Service service;
