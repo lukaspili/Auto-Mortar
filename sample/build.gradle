@@ -17,7 +17,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "mvp.sample"
+        applicationId "automortar.sample"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -67,6 +67,6 @@ dependencies {
 
     compile deps.autodagger2
     apt deps.autodagger2_compiler
-//    compile group: 'com.github.lukaspili', name: 'autodagger', version: '0.3-SNAPSHOT', changing: true
-//    apt group: 'com.github.lukaspili', name: 'autodagger-compiler', version: '0.3-SNAPSHOT', changing: true
+//    compile group: 'com.github.lukaspili', name: 'autodagger2', version: '0.5-SNAPSHOT', changing: true
+//    apt group: 'com.github.lukaspili', name: 'autodagger2-compiler', version: '0.5-SNAPSHOT', changing: true
 }
