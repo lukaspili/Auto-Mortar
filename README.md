@@ -279,7 +279,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.1.3'
-        classpath 'com.github.dcendents:android-maven-plugin:1.2'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
     }
 }
 
