@@ -11,7 +11,7 @@ import mortar.ViewPresenter;
 import timber.log.Timber;
 
 /**
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 @AutoScreen(
         component = @AutoComponent(dependencies = PostsPresenter.class, superinterfaces = AppDependencies.class),

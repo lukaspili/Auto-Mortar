@@ -1,7 +1,7 @@
 package automortar;
 
 /**
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 public interface ScreenComponentFactory<T_Dependency> {
 

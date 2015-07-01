@@ -1,7 +1,7 @@
 package automortar.sample.model;
 
 /**
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 public class Post {
     private long id;

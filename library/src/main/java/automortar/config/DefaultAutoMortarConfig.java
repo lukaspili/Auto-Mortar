@@ -5,7 +5,7 @@ import java.lang.annotation.Annotation;
 /**
  * Default configuration applied in none is provided
  *
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 public class DefaultAutoMortarConfig implements AutoMortarConfig {
 

@@ -3,7 +3,7 @@ package automortar.compiler;
 /**
  * Pass data between processing steps
  *
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 public class State {
 

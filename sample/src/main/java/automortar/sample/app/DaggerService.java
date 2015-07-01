@@ -5,7 +5,7 @@ import android.content.Context;
 import automortar.config.DefaultAutoMortarConfig;
 
 /**
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 public class DaggerService {
 

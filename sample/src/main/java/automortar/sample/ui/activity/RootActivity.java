@@ -29,7 +29,7 @@ import mortar.MortarScope;
 import mortar.bundler.BundleServiceRunner;
 
 /**
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 @AutoComponent(dependencies = App.class, superinterfaces = AppDependencies.class)
 @AutoInjector

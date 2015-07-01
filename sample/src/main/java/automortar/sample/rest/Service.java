@@ -8,7 +8,7 @@ import retrofit.Callback;
 import retrofit.http.GET;
 
 /**
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 public interface Service {
 

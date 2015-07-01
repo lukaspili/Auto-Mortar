@@ -9,7 +9,7 @@ import flownavigation.common.mortar.BasicMortarContextFactory;
 import flownavigation.path.Path;
 
 /**
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 public class MortarPathContainerView extends FramePathContainerView {
 

@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 import autodagger.AutoComponent;
 
 /**
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)

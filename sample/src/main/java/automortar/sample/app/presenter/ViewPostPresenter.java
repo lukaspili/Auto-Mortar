@@ -16,7 +16,7 @@ import automortar.sample.ui.view.ViewPostView;
 import timber.log.Timber;
 
 /**
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 @AutoScreen(
         component = @AutoComponent(dependencies = RootActivity.class),

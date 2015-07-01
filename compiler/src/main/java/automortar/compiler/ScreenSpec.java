@@ -10,7 +10,7 @@ import java.util.List;
 import automortar.compiler.ModuleSpec;
 
 /**
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 public class ScreenSpec {
 

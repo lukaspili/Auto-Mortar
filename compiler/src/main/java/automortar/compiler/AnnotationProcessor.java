@@ -11,7 +11,7 @@ import processorworkflow.AbstractProcessor;
 import processorworkflow.Logger;
 
 /**
- * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>
+ * @author Lukasz Piliszczuk - lukasz.pili@gmail.com
  */
 @AutoService(Processor.class)
 public class AnnotationProcessor extends AbstractProcessor<State> {
