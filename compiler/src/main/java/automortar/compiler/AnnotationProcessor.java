@@ -17,7 +17,7 @@ import processorworkflow.Logger;
 public class AnnotationProcessor extends AbstractProcessor<State> {
 
     public AnnotationProcessor() {
-        Logger.init("Auto Mortar Processor", true);
+        Logger.init("Auto Mortar Processor", false);
     }
 
     @Override

@@ -295,8 +295,9 @@ dependencies {
     apt 'com.github.lukaspili.autodagger2:autodagger2-compiler:1.1'
     compile 'com.github.lukaspili.autodagger2:autodagger2:1.1'
 
-    apt 'com.google.dagger:dagger:2.0.1'
+    apt 'com.google.dagger:dagger-compiler:2.0.1'
     compile 'com.google.dagger:dagger:2.0.1'
+    provided 'javax.annotation:jsr250-api:1.0'
 }
 ```
 
