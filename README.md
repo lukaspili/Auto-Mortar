@@ -298,6 +298,10 @@ dependencies {
     apt 'com.google.dagger:dagger-compiler:2.0.1'
     compile 'com.google.dagger:dagger:2.0.1'
     provided 'javax.annotation:jsr250-api:1.0'
+
+    compile 'com.squareup.mortar:mortar:0.17'
+    compile 'com.squareup.flow:flow:0.10'
+    compile 'com.squareup.flow:flow-path:0.10'
 }
 ```
 
