@@ -12,8 +12,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface AutoMortarConfig {
 
-    boolean butterknife() default true;
-
     Class<?> screenSuperclass() default void.class;
 
     String daggerServiceName() default DefaultAutoMortarConfig.DAGGER_SERVICE_NAME;

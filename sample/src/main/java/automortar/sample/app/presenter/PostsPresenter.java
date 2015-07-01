@@ -12,6 +12,7 @@ import automortar.sample.R;
 import automortar.sample.app.AppDependencies;
 import automortar.sample.app.DaggerScope;
 import automortar.sample.app.adapter.PostAdapter;
+import automortar.sample.app.presenter.screen.ViewPostScreen;
 import automortar.sample.model.Post;
 import automortar.sample.rest.RestClient;
 import automortar.sample.ui.activity.RootActivity;

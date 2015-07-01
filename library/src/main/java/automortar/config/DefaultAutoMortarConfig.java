@@ -12,11 +12,6 @@ public class DefaultAutoMortarConfig implements AutoMortarConfig {
     public static final String DAGGER_SERVICE_NAME = "automortar.DaggerService";
 
     @Override
-    public boolean butterknife() {
-        return false;
-    }
-
-    @Override
     public Class<?> screenSuperclass() {
         return null;
     }

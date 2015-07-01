@@ -1,10 +1,12 @@
 apply plugin: 'java'
+apply plugin: 'idea'
 
 sourceCompatibility = '1.7'
 targetCompatibility = '1.7'
 
 configurations {
     provided
+    provided.extendsFrom(compile)
 }
 
 sourceSets {
@@ -13,16 +15,16 @@ sourceSets {
     }
 }
 
-//configurations.all {
-//    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-//}
+idea {
+    module {
+        scopes.PROVIDED.plus += [configurations.provided]
+    }
+}
 
 dependencies {
-    compile deps.mortar
-    compile deps.autodagger2
-//    compile group: 'com.github.lukaspili', name: 'autodagger', version: '0.3-SNAPSHOT', changing: true
-
-    provided 'javax.inject:javax.inject:1'
+    provided deps.mortar
+    provided deps.autodagger2
+    provided deps.javax_annotation_jsr250
     provided deps.android
 }
 

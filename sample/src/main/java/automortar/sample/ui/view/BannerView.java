@@ -8,11 +8,11 @@ import android.widget.LinearLayout;
 import javax.inject.Inject;
 
 import autodagger.AutoInjector;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import automortar.sample.R;
 import automortar.sample.app.presenter.ViewPostPresenter;
-import automortar.sample.app.presenter.ViewPostScreen;
+import automortar.sample.app.presenter.screen.ViewPostScreen;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * @author Lukasz Piliszczuk <lukasz.pili@gmail.com>

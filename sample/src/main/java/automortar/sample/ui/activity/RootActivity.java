@@ -15,7 +15,7 @@ import automortar.sample.app.AppComponent;
 import automortar.sample.app.AppDependencies;
 import automortar.sample.app.DaggerScope;
 import automortar.sample.app.DaggerService;
-import automortar.sample.app.presenter.PostsScreen;
+import automortar.sample.app.presenter.screen.PostsScreen;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import flow.Flow;

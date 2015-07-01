@@ -11,7 +11,7 @@ import autodagger.AutoInjector;
 import automortar.sample.R;
 import automortar.sample.app.DaggerService;
 import automortar.sample.app.presenter.ViewPostPresenter;
-import automortar.sample.app.presenter.ViewPostScreenComponent;
+import automortar.sample.app.presenter.screen.ViewPostScreenComponent;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
