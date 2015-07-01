@@ -6,6 +6,7 @@
  * New: Change maven dependency groupId from `com.github.lukaspili` to **`com.github.lukaspili.automortar`**
  * Fix: Remove Mortar and Dagger2 dependencies
  * Remove: Butterknife config option
+ * BREAKING CHANGE: `ScreenComponentFactory` has now a parameterized type, and `createComponent` takes only 1 dependency as parameter
  * BREAKING CHANGE: The package of the generated screen changed, you need to clean and re-import the generated screen classes
 
 

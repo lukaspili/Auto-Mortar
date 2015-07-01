@@ -1,6 +1,6 @@
 # Auto Mortar
 
-Implementing MVP pattern with Mortar / Flow / Dagger 2 requires to write a lot of boilerplate code.  
+Mortar / Flow / Dagger 2 requires to write a lot of boilerplate code.  
 Auto Mortar is an annotation processor that focuses on eliminating the maximum of that boilerplate. No magic tricks here, just some straightforward and human readable code generated for you.
 
 
@@ -60,8 +60,9 @@ public class ShowUserScreen extends Path {
 
 ### With Auto Mortar
 
-```java
+You only write the Presenter class.
 
+```java
 // ShowUserPresenter.java
 
 @AutoScreen(
@@ -70,7 +71,7 @@ public class ShowUserScreen extends Path {
 )
 @DaggerScope(ShowUserPresenter.class)
 @Layout(R.layout.screen_show_user)
-public class ShowUserPresenter extends ViewPresenter<MVP_ShowUserScreen.View> {
+public class ShowUserPresenter extends ViewPresenter<ShowUserView> {
 
     private final String username;
     private final RestClient restClient;
@@ -100,16 +101,16 @@ For the ShowUserPresenter class, it will generate:
 - ShowUserScreenComponent
 - ShowUserScreen.Module
 
-All the generated code is readable and accessible in your IDE, in the same way dagger 2 does.
+All the generated code is readable and accessible in your IDE, in the same way Dagger 2 does.
 
 
 #### Screen
 
 The generated screen is named XyzScreen, while your presenter should be named XyzPresenter.  
-The screen contains the generated Module as a subclass.  
+The screen contains the generated Module as a static subclass.  
 
 The generated screen can be annoted with your custom annotation.  
-In order to do so, you have to first annotate the presenter with that annotation, and then specify the annotation class in `@MVP screenAnnotations` member.
+In order to do so, you have to first annotate the presenter with that annotation, and then specify the annotation class in `@AutoScreen screenAnnotations` member.
 
 For instance, if you have a `@Layout` annotation you want to apply on the generated screen:
 
@@ -118,20 +119,23 @@ For instance, if you have a `@Layout` annotation you want to apply on the genera
 	screenAnnotations = Layout.class
 )
 @Layout(R.layout.my_layout)
-public class ViewPostPresenter {}
+public class PostsPresenter {}
 ```
 
 The generated screen will look like:
 
 ```java
 @Layout(2130903043) // equals to R.layout.my_layout
-public final class MVP_PostsScreen {}
+public final class PostsScreen {}
 ```
 
-In order to use the screen instance, like in navigation between screens with Flow, use:  
-`Flow.get(context).set(new YourNameScreen())`
+If you configured Auto Mortar to make the generated screens extend from `Path`, you can then use them with Flow.
 
-For navigation parameters between screens, see below.
+```java
+`Flow.get(context).set(new ViewPostScreen(1234))`
+```
+
+To see how to configure Auto Mortar and how to pass navigation parameters between screens, see below.
 
 
 #### Component
@@ -159,10 +163,7 @@ Generated module looks like:
 ```
 
 
-
-## More uses
-
-### Configuration
+### Auto Mortar configuration
 
 You can also customize the code generation through a configuration annotation.  
 Create a new empty interface (or class), and annotate it with `@AutoMortarConfig`. All configuration options are exposed as members of `@AutoMortarConfig`.
@@ -214,8 +215,6 @@ public final class ShowUserScreen {
       return new ShowUserPresenter(username, restClient);
     }
   }
-
-  // ...
 }
 ```
 
@@ -227,15 +226,15 @@ Finally, navigate between screens like you would normally do:
 
 When using Mortar and Flow together, you would setup a context factory that setups the mortar context associated with the screen to display. You would use `DaggerService.createComponent()` to create the component associated to the screen, using reflection.  
 `@AutoScreen` generates for you the method that create the component without reflection.
-The generated screen implements a `ComponentFactory` interface that declares the createComponent method. This method takes an array of dependencies as parameter, and returns an instance of the component. It looks like:
+The generated screen implements a `ScreenComponentFactory` interface that declares the createComponent method. It takes the component dependency as parameter, and returns an instance of the component. It looks like:
 
 ```java
-public final class ViewPostScreen implements ComponentFactory {
+public final class ViewPostScreen implements ScreenComponentFactory<RootActivityComponent> {
 
   @Override
-  public Object createComponent(Object... dependencies) {
-    return DaggerMVP_ViewPostScreen_Component.builder()
-    	.component((RootActivity.Component)dependencies[0])
+  public Object createComponent(RootActivityComponent dependency) {
+    return DaggerViewPostScreenComponent.builder()
+    	.component(dependency)
     	.module(new Module())
     	.build();
   }
@@ -244,7 +243,7 @@ public final class ViewPostScreen implements ComponentFactory {
 The generated screen provides also a helper static get method that retreives the component from the context:
 
 ```java
-public final class ViewPostScreen implements ComponentFactory {
+public final class ViewPostScreen implements ScreenComponentFactory {
 
   public static ViewPostScreenComponent getComponent(Context context) {
     return (ViewPostScreenComponent) context.getSystemService(AutoMortarConfig.DAGGER_SERVICE_NAME);
@@ -269,8 +268,7 @@ You can also check a full demo project with Auto Mortar here:
 
 ## Installation
 
-Gradle apt plugin recommended, like for dagger 2.
-You would also need Auto Dagger2 dependency.
+Beware that the groupId changed to **com.github.lukaspili.automortar**
 
 ```groovy
 buildscript {
@@ -288,15 +286,17 @@ apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
     jcenter()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
 dependencies {
-    apt 'com.github.lukaspili:automortar-compiler:1.0-SNAPSHOT'
-    compile 'com.github.lukaspili:automortar:1.0-SNAPSHOT'
+    apt 'com.github.lukaspili.automortar:automortar-compiler:1.1'
+    compile 'com.github.lukaspili.automortar:automortar:1.1'
     
-    apt 'com.github.lukaspili:autodagger2-compiler:1.0'
-    compile 'com.github.lukaspili:autodagger2:1.0'
+    apt 'com.github.lukaspili.autodagger2:autodagger2-compiler:1.1'
+    compile 'com.github.lukaspili.autodagger2:autodagger2:1.1'
+
+    apt 'com.google.dagger:dagger:2.0.1'
+    compile 'com.google.dagger:dagger:2.0.1'
 }
 ```
 
